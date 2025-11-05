@@ -19,12 +19,13 @@ public class SimpleECommerceTest {
             System.out.println("6. View top 3 rated products");
             System.out.println("7. View orders between dates");
             System.out.println("8. Add review to product");
-            System.out.println("9. View customer reviews");
-            System.out.println("10. View common high-rated products (rating > 4.0)");
-            System.out.println("11. Place an order");
-            System.out.println("12. Cancel an order");
-            System.out.println("13. Update order status");
-            System.out.println("14. Exit");
+            System.out.println("9. Edit review");
+            System.out.println("10. View customer reviews");
+            System.out.println("11. View common high-rated products (rating > 4.0)");
+            System.out.println("12. Place an order");
+            System.out.println("13. Cancel an order");
+            System.out.println("14. Update order status");
+            System.out.println("15. Exit");
             System.out.print("Choose option: ");
 
             int choice = scan.nextInt();
@@ -63,17 +64,27 @@ public class SimpleECommerceTest {
                     int prodId = scan.nextInt();
                     System.out.print("Enter rating (1-5): ");
                     double rating = scan.nextDouble();
-                    scan.nextLine(); // Consume newline
+                    scan.nextLine(); 
                     System.out.print("Enter comment: ");
                     String comment = scan.nextLine();
                     Customer.addReviewToProduct(custId, prodId, rating, comment);
                     break;
                 case 9:
+                    System.out.print("Enter review ID to edit: ");
+                    int reviewId = scan.nextInt();
+                    System.out.print("Enter new rating (1-5): ");
+                    double newRating = scan.nextDouble();
+                    scan.nextLine(); 
+                    System.out.print("Enter new comment: ");
+                    String newComment = scan.nextLine();
+                    Review.editReview(reviewId, newRating, newComment);
+                    break;
+                case 10:
                     System.out.print("Enter customer ID: ");
                     int customerId = scan.nextInt();
                     Customer.printCustomerReviews(customerId);
                     break;
-                case 10:
+                case 11:
                     System.out.print("Enter first customer ID: ");
                     int cust1 = scan.nextInt();
                     System.out.print("Enter second customer ID: ");
@@ -92,7 +103,7 @@ public class SimpleECommerceTest {
                         }
                     }
                     break;
-                case 11:
+                case 12:
                     System.out.print("Enter customer ID: ");
                     int placeCustomerId = scan.nextInt();
                     System.out.print("Enter product ID: ");
@@ -104,12 +115,12 @@ public class SimpleECommerceTest {
                     String orderDate = scan.nextLine();
                     Customer.placeOrder(placeCustomerId, placeProductId, quantity, orderDate);
                     break;
-                case 12:
+                case 13:
                     System.out.print("Enter order ID to cancel: ");
                     int cancelId = scan.nextInt();
                     Order.cancelOrder(cancelId);
                     break;
-                case 13:
+                case 14:
                     System.out.print("Enter order ID to update: ");
                     int updateId = scan.nextInt();
                     scan.nextLine();
@@ -117,7 +128,7 @@ public class SimpleECommerceTest {
                     String newStatus = scan.nextLine();
                     Order.updateOrderStatus(updateId, newStatus);
                     break;
-                case 14:
+                case 15:
                     System.out.println("Exiting program.");
                     scan.close();
                     return;

@@ -68,6 +68,8 @@ Review Operations
 
 Review.addReview(Review r): Adds a new review to the system and links it to the corresponding product.
 
+Review.editReview(int reviewId, double newRating, String newComment): Edits an existing review's rating and comment - Time: O(R).
+
 Review.getReviewsByCustomer(int customerId): Returns all reviews written by a specific customer - Time: O(R).
 
 Review.getCommonHighRatedProducts(int custId1, int custId2): Returns products that both customers reviewed with average rating > 4.0 - Time: O(R * R_cust + P * R_avg).
@@ -93,15 +95,16 @@ Order Queries:
 
 Review Operations:
 - **Add Review to Product** (Option 8): Customer.addReviewToProduct() - Allows customers to submit product reviews with ratings 1-5
-- **View Customer Reviews** (Option 9): Customer.printCustomerReviews() - Displays all reviews written by a specific customer
+- **Edit Review** (Option 9): Review.editReview() - Allows editing an existing review's rating and comment
+- **View Customer Reviews** (Option 10): Customer.printCustomerReviews() - Displays all reviews written by a specific customer
 
 Advanced Query:
-- **Common High-Rated Products** (Option 10): Review.getCommonHighRatedProducts(custId1, custId2) - Returns products that both customers reviewed with overall average rating > 4.0 (O(R * R_cust + P * R_avg))
+- **Common High-Rated Products** (Option 11): Review.getCommonHighRatedProducts(custId1, custId2) - Returns products that both customers reviewed with overall average rating > 4.0 (O(R * R_cust + P * R_avg))
 
 Order Management:
-- **Place an Order** (Option 11): Customer.placeOrder() - Creates new orders with stock validation, automatic order ID generation, and "pending" status
-- **Cancel an Order** (Option 12): Order.cancelOrder() - Cancels orders and automatically restores product stock
-- **Update Order Status** (Option 13): Order.updateOrderStatus() - Updates order status (pending/shipped/delivered/canceled)
+- **Place an Order** (Option 12): Customer.placeOrder() - Creates new orders with stock validation, automatic order ID generation, and "pending" status
+- **Cancel an Order** (Option 13): Order.cancelOrder() - Cancels orders and automatically restores product stock
+- **Update Order Status** (Option 14): Order.updateOrderStatus() - Updates order status (pending/shipped/delivered/canceled)
 
 4. Project Structure
 
@@ -308,6 +311,11 @@ Time Complexity: O(R)
 Space Complexity: O(1)
 Analysis: Traverses to the end of the allReviews LinkedList to insert at tail position. No additional data structures created.
 
+Review.editReview(int reviewId, double newRating, String newComment):
+Time Complexity: O(R)
+Space Complexity: O(1)
+Analysis: Linear search through all R reviews to find the review with matching ID. Once found, updates rating and comment fields in O(1). Uses only local variables.
+
 Review.printAll():
 Time Complexity: O(R)
 Space Complexity: O(1)
@@ -434,32 +442,37 @@ Time Complexity: O(C + P + R + R_prod)
 Space Complexity: O(1)
 Analysis: O(C) find customer, O(P) find product, O(R) generate review ID, O(R_prod) add to product's review list.
 
-Option 9 - View Customer Reviews (Customer.printCustomerReviews):
+Option 9 - Edit Review (Review.editReview):
+Time Complexity: O(R)
+Space Complexity: O(1)
+Analysis: O(R) to search through all reviews to find the review by ID, O(1) to update rating and comment fields.
+
+Option 10 - View Customer Reviews (Customer.printCustomerReviews):
 Time Complexity: O(C + R)
 Space Complexity: O(R_cust)
 Analysis: O(C) find customer, O(R) iterate all reviews to find matches. Creates new list with R_cust reviews.
 
-Option 10 - View Common High-Rated Products (Review.getCommonHighRatedProducts):
+Option 11 - View Common High-Rated Products (Review.getCommonHighRatedProducts):
 Time Complexity: O(R*R_cust + R_cust² + P*R_avg)
 Space Complexity: O(R_cust + P_common)
 Analysis: Most complex query. O(R*R_cust) to get products reviewed by each customer (with duplicate checking), O(R_cust²) to find intersection, O(P_common*R_avg) to filter by rating > 4.0. Creates lists for products reviewed by each customer and common products.
 
-Option 11 - Place an Order (Customer.placeOrder):
+Option 12 - Place an Order (Customer.placeOrder):
 Time Complexity: O(C + P + M + L)
 Space Complexity: O(L)
 Analysis: O(C) find customer, O(P) find product, O(M) generate order ID, O(L) create product list with quantity L copies. Creates new Order object with LinkedList of L products.
 
-Option 12 - Cancel an Order (Order.cancelOrder):
+Option 13 - Cancel an Order (Order.cancelOrder):
 Time Complexity: O(M + L² + L*P)
 Space Complexity: O(L)
 Analysis: O(M) find order, O(L²) count product occurrences with nested list traversals, O(L*P) restore stock for unique products. Creates temporary lists for product IDs and counts.
 
-Option 13 - Update Order Status (Order.updateOrderStatus):
+Option 14 - Update Order Status (Order.updateOrderStatus):
 Time Complexity: O(M)
 Space Complexity: O(1)
 Analysis: O(M) to find order by ID, O(1) to validate and update status field.
 
-Option 14 - Exit:
+Option 15 - Exit:
 Time Complexity: O(1)
 Space Complexity: O(1)
 Analysis: Closes scanner and returns from main method.
