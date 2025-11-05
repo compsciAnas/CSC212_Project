@@ -19,7 +19,13 @@ public class Customer {
     }
 
 
-    public static void addCustomer(Customer c) {
+    public static boolean addCustomer(Customer c) {
+        // Check for duplicate customer ID
+        if (searchById(c.customerId) != null) {
+            System.out.println("Error: Customer ID " + c.customerId + " already exists. Cannot add duplicate customer.");
+            return false;
+        }
+        
         if (customers.empty()) {
             customers.insert(c);
         } else {
@@ -29,6 +35,7 @@ public class Customer {
             }
             customers.insert(c);
         }
+        return true;
     }
 
     public static Customer searchById(int id) {

@@ -53,7 +53,13 @@ public class Product {
     }
 
 
-    public static void addProduct(Product p) {
+    public static boolean addProduct(Product p) {
+        // Check for duplicate product ID
+        if (searchById(p.productId) != null) {
+            System.out.println("Error: Product ID " + p.productId + " already exists. Cannot add duplicate product.");
+            return false;
+        }
+        
         if (products.empty()) {
             products.insert(p);
         } else {
@@ -63,6 +69,7 @@ public class Product {
             }
             products.insert(p);
         }
+        return true;
     }
 
     public static Product searchById(int id) {
@@ -73,6 +80,21 @@ public class Product {
         while (products.retrieve() != null) {
             Product p = products.retrieve();
             if (p.productId == id)
+                return p;
+            if (products.last()) break;
+            products.findNext();
+        }
+        return null;
+    }
+
+    public static Product searchByName(String name) {
+        if (products.empty())
+            return null;
+
+        products.findFirst();
+        while (products.retrieve() != null) {
+            Product p = products.retrieve();
+            if (p.name.equalsIgnoreCase(name))
                 return p;
             if (products.last()) break;
             products.findNext();

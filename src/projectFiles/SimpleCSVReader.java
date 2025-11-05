@@ -21,7 +21,9 @@ public class SimpleCSVReader {
                     double price = Double.parseDouble(fields[2].trim());
                     int stock = Integer.parseInt(fields[3].trim());
 
-                    Product.addProduct(new Product(id, name, price, stock));
+                    if (!Product.addProduct(new Product(id, name, price, stock))) {
+                        System.out.println("Warning: Skipping duplicate product ID " + id + " in CSV file.");
+                    }
                 } catch (NumberFormatException e) {
                     System.out.println("Error parsing product line: " + line);
                 }
@@ -45,7 +47,9 @@ public class SimpleCSVReader {
                     String name = fields[1].trim();
                     String email = fields[2].trim();
 
-                    Customer.addCustomer(new Customer(id, name, email));
+                    if (!Customer.addCustomer(new Customer(id, name, email))) {
+                        System.out.println("Warning: Skipping duplicate customer ID " + id + " in CSV file.");
+                    }
                 } catch (NumberFormatException e) {
                     System.out.println("Error parsing customer line: " + line);
                 }
