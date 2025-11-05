@@ -2,104 +2,7 @@ Project 212 - E-Commerce System Report
 
 A Java-based e-commerce management system that handles customers, products, orders, and reviews using a custom-built LinkedList data structure, as required by the project specifications.
 
-1. Class Diagram
-
-This diagram describes the classes and their relationships. The system is built on a static data model, where each core class (Product, Customer, Order, Review) holds a static LinkedList of all instances of that object.
-
-classDiagram
-    class LinkedList~T~ {
-        -Node~T~ head
-        -Node~T~ current
-        +insert(T data)
-        +remove()
-        +retrieve()
-        +update(T data)
-        +findFirst()
-        +findNext()
-        +last()
-        +empty()
-    }
-    
-    class Node~T~ {
-        -T data
-        -Node~T~ next
-    }
-    
-    class Product {
-        -int productId
-        -String name
-        -double price
-        -int stock
-        -LinkedList~Review~ reviews
-        -static LinkedList~Product~ products
-        +addProduct(Product p)
-        +searchById(int id)
-        +updateProduct(int id, double price, int stock)
-        +removeProduct(int id)
-        +printAll()
-        +printOutOfStock()
-        +topThreeProducts()
-        +addReview(Review r)
-        +getAverageRating()
-        +toString()
-    }
-    
-    class Customer {
-        -int customerId
-        -String name
-        -String email
-        -static LinkedList~Customer~ customers
-        +addCustomer(Customer c)
-        +searchById(int id)
-        +printAll()
-        +updateCustomer(int id, String name, String email)
-        +placeOrder(int cId, int pId, int qty, String date)
-        +viewOrderHistory(int cId)
-        +addReviewToProduct(int cId, int pId, double rating, String comment)
-        +printCustomerReviews(int cId)
-        +toString()
-    }
-    
-    class Order {
-        -int orderId
-        -Customer customer
-        -LinkedList~Product~ products
-        -double totalPrice
-        -String orderDate
-        -String status
-        -static LinkedList~Order~ orders
-        +addOrder(Order o)
-        +printAll()
-        +printOrdersBetween(String start, String end)
-        +searchById(int id)
-        +updateOrderStatus(int id, String status)
-        +cancelOrder(int id)
-        +toString()
-    }
-    
-    class Review {
-        -int reviewId
-        -Product product
-        -Customer customer
-        -String comment
-        -double rating
-        -static LinkedList~Review~ allReviews
-        +addReview(Review r)
-        +printAll()
-        +getReviewsByCustomer(int cId)
-        +getCommonHighRatedProducts(int c1, int c2)
-        +toString()
-    }
-
-    LinkedList "1" o-- "1" Node
-    Product "1" o-- "*" Review
-    Order "*" o-- "1" Customer
-    Order "1" o-- "*" Product
-    Review "*" o-- "1" Product
-    Review "*" o-- "1" Customer
-
-
-2. Data Structure
+1. Data Structure
 
 This project uses a custom LinkedList implementation (projectFiles.LinkedList) as the sole data structure for managing all collections. This fulfills the project requirement of not using any built-in Java collections.
 
@@ -109,7 +12,7 @@ Instance Collections: Product instances hold a LinkedList of their reviews. Cust
 
 Search Results: Methods return new LinkedList instances containing results.
 
-3. Implemented Core Features
+2. Implemented Core Features
 
 Product Operations
 
@@ -171,7 +74,7 @@ Review.getCommonHighRatedProducts(int custId1, int custId2): Returns products th
 
 Review.printAll(): Prints all reviews in the system.
 
-4. Implemented Business Queries & Interactive Features
+3. Implemented Business Queries & Interactive Features
 
 The following advanced business queries and interactive features are fully implemented in the SimpleECommerceTest menu system:
 
@@ -200,7 +103,7 @@ Order Management:
 - **Cancel an Order** (Option 12): Order.cancelOrder() - Cancels orders and automatically restores product stock
 - **Update Order Status** (Option 13): Order.updateOrderStatus() - Updates order status (pending/shipped/delivered/canceled)
 
-5. Project Structure
+4. Project Structure
 
 CSC212_Project/
 ├── src/
@@ -232,7 +135,7 @@ How to Run:
    - Add and view reviews
 
 
-6. Algorithm Complexity Analysis
+5. Algorithm Complexity Analysis
 
 Variable Definitions
 
@@ -561,78 +464,7 @@ Time Complexity: O(1)
 Space Complexity: O(1)
 Analysis: Closes scanner and returns from main method.
 
-Complexity Summary by Operation Type:
-
-TIME COMPLEXITY CATEGORIES:
-
-Constant Time O(1) Operations:
-- All LinkedList basic operations (insert, remove, retrieve, update, findFirst, findNext, last, empty)
-- All toString() methods (except Order.toString which is O(L))
-- Field updates after object is found
-- Status validation
-
-Linear Time O(n) Operations:
-- All search operations (searchById methods): O(P), O(C), O(M)
-- All printAll operations: O(P), O(C), O(R)
-- Single-pass filters (out of stock, date range): O(P), O(M)
-- Review filtering by customer: O(R)
-- Adding to end of list: O(n) where n is current list size
-
-Quadratic Time O(n²) Operations:
-- Bubble Sort in topThreeProducts: O(P²)
-- Product occurrence counting in cancelOrder: O(L²)
-- Intersection finding in getCommonHighRatedProducts: O(R_cust²)
-- CSV file loading (building list from empty): O(P²), O(C²), etc.
-
-Complex Multi-Step Operations (Combined Complexity):
-- placeOrder: O(C + P + M + L) - Multiple sequential searches + list creation
-- cancelOrder: O(M + L² + L*P) - Search + nested counting + stock restoration
-- addReviewToProduct: O(C + P + R + R_prod) - Multiple searches + insertions
-- getCommonHighRatedProducts: O(R*R_cust + R_cust² + P*R_avg) - Multiple filters + intersection
-- loadOrders: O(M_file * (C + P*L + M)) - File I/O with multiple lookups per line
-
-Most Expensive Operations (Worst Case Time):
-1. Review.getCommonHighRatedProducts: O(R*R_cust + R_cust² + P*R_avg)
-2. Product.topThreeProducts: O(P² + P*R_avg)
-3. SimpleCSVReader.loadProducts: O(P²) when building list
-4. Order.cancelOrder: O(M + L² + L*P)
-5. SimpleCSVReader.loadOrders: O(M_file * (C + P*L + M))
-
-SPACE COMPLEXITY CATEGORIES:
-
-Constant Space O(1) Operations:
-- All LinkedList pointer operations (no new nodes created)
-- All search operations (use only local variables)
-- All update operations (modify existing objects)
-- All print operations (no result storage)
-- toString() methods (except Order which is O(L))
-- Status validation and field updates
-
-Linear Space O(n) Operations:
-- Product.topThreeProducts: O(P) for temporary arrays
-- Customer.placeOrder: O(L) for product list
-- Order.cancelOrder: O(L) for counting lists
-- Customer.printCustomerReviews: O(R_cust) for result list
-- Review.getReviewsByCustomer: O(R_cust) for result list
-- Order.toString: O(L) for StringBuilder
-- Each Node.insert: O(1) per node, O(n) for n insertions
-
-Complex Space Operations:
-- Review.getCommonHighRatedProducts: O(R_cust + P_common) - Multiple result lists
-- SimpleCSVReader.loadOrders: O(L) per order being processed
-
-Total System Space Complexity:
-- Static LinkedLists: O(P + C + M + R) for all entities
-- Product reviews: O(P * R_avg) total across all products
-- Order products: O(M * L_avg) total across all orders
-
-Space Optimization Notes:
-- Most query operations are space-efficient (O(1) auxiliary space)
-- Result lists are only as large as the filtered results
-- No unnecessary data duplication
-- StringBuilder used for efficient string concatenation
-
-7. CSV File Formats
+6. CSV File Formats
 
 customers.csv
 
