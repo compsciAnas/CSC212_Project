@@ -1,11 +1,5 @@
 package projectFiles;
-/**
- * Project 212 - E-Commerce System
- * Version: 2.0
- * Last Updated: 2025-01-27
- * 
- * Product class representing items in the e-commerce system.
- */
+
 public class Product {
     int productId;
     String name;
@@ -13,7 +7,7 @@ public class Product {
     int stock;
     LinkedList<Review> reviews;
 
-    // كل المنتجات تُخزن هنا
+
     static LinkedList<Product> products = new LinkedList<Product>();
 
     public Product(int productId, String name, double price, int stock) {
@@ -58,7 +52,7 @@ public class Product {
         return "[" + productId + "] " + name + " - $" + price + " | Stock: " + stock;
     }
 
-    // عمليات عامة على المنتجات
+
     public static void addProduct(Product p) {
         if (products.empty()) {
             products.insert(p);

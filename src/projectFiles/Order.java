@@ -1,11 +1,5 @@
 package projectFiles;
-/**
- * Project 212 - E-Commerce System
- * Version: 2.0
- * Last Updated: 2025-01-27
- * 
- * Order class representing orders in the e-commerce system.
- */
+
 public class Order {
     int orderId;
     Customer customer;
@@ -14,7 +8,7 @@ public class Order {
     String orderDate;
     String status;  // pending, shipped, delivered, canceled
 
-    // كل الطلبات تُخزن هنا
+
     static LinkedList<Order> orders = new LinkedList<Order>();
 
     public Order(int orderId, Customer customer, LinkedList<Product> products, double totalPrice, String orderDate, String status) {
@@ -52,7 +46,7 @@ public class Order {
         return sb.toString();
     }
 
-    // عمليات عامة على الطلبات
+
     public static void addOrder(Order o) {
         if (orders.empty()) {
             orders.insert(o);
@@ -137,7 +131,7 @@ public class Order {
 
         // Restore product stock by counting occurrences of each product
         if (!order.products.empty()) {
-            // Count occurrences using LinkedList (no Java Collections)
+            // Count occurrences using LinkedList
             order.products.findFirst();
             LinkedList<Integer> productIds = new LinkedList<Integer>();
             LinkedList<Integer> counts = new LinkedList<Integer>();

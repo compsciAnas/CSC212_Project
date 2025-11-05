@@ -4,7 +4,6 @@ import java.util.Scanner;
 public class SimpleECommerceTest {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
-        // Load CSV files from repository root
         SimpleCSVReader.loadProducts("products.csv");
         SimpleCSVReader.loadCustomers("customers.csv");
         SimpleCSVReader.loadOrders("orders.csv");
@@ -29,7 +28,7 @@ public class SimpleECommerceTest {
             System.out.print("Choose option: ");
 
             int choice = scan.nextInt();
-            scan.nextLine(); // Consume newline
+            scan.nextLine(); 
             
             switch (choice) {
                 case 1:
@@ -100,7 +99,7 @@ public class SimpleECommerceTest {
                     int placeProductId = scan.nextInt();
                     System.out.print("Enter quantity: ");
                     int quantity = scan.nextInt();
-                    scan.nextLine(); // Consume newline
+                    scan.nextLine(); 
                     System.out.print("Enter order date (YYYY-MM-DD): ");
                     String orderDate = scan.nextLine();
                     Customer.placeOrder(placeCustomerId, placeProductId, quantity, orderDate);

@@ -1,11 +1,5 @@
 package projectFiles;
-/**
- * Project 212 - E-Commerce System
- * Version: 2.0
- * Last Updated: 2025-01-27
- * 
- * Review class representing customer reviews for products.
- */
+
 public class Review {
     int reviewId;
     Product product;
@@ -13,7 +7,7 @@ public class Review {
     String comment;
     double rating;
 
-    // كل المراجعات تُخزن هنا
+
     static LinkedList<Review> allReviews = new LinkedList<Review>();
 
     public Review(int reviewId, Product product, Customer customer, String comment, double rating) {
@@ -31,7 +25,7 @@ public class Review {
                " | Comment: " + comment;
     }
 
-    // Add review to system
+
     public static void addReview(Review r) {
         if (allReviews.empty()) {
             allReviews.insert(r);
@@ -44,8 +38,7 @@ public class Review {
         }
     }
 
-    // Edit an existing review
-    // Time Complexity: O(R) where R is total number of reviews
+
     public static void editReview(int reviewId, double newRating, String newComment) {
         if (allReviews.empty()) {
             System.out.println("No reviews found.");
@@ -67,8 +60,7 @@ public class Review {
         System.out.println("Review not found.");
     }
 
-    // Get all reviews by a specific customer
-    // Time Complexity: O(R) where R is total number of reviews
+
     public static LinkedList<Review> getReviewsByCustomer(int customerId) {
         LinkedList<Review> customerReviews = new LinkedList<Review>();
         
@@ -97,8 +89,7 @@ public class Review {
         return customerReviews;
     }
 
-    // Get common products reviewed by two customers with average rating > 4.0
-    // Time Complexity: O(R + P*R_avg) where R is total reviews, P is products, R_avg is average reviews per product
+
     public static LinkedList<Product> getCommonHighRatedProducts(int customerId1, int customerId2) {
         LinkedList<Product> result = new LinkedList<Product>();
 

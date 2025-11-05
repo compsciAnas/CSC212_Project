@@ -1,11 +1,5 @@
 package projectFiles;
-/**
- * Project 212 - E-Commerce System
- * Version: 2.0
- * Last Updated: 2025-01-27
- * 
- * Custom LinkedList implementation using the List interface.
- */
+
 public class LinkedList<T> implements List<T> {
 
     private Node<T> head;

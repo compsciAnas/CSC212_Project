@@ -1,17 +1,10 @@
 package projectFiles;
-/**
- * Project 212 - E-Commerce System
- * Version: 2.0
- * Last Updated: 2025-01-27
- * 
- * Customer class representing customers in the e-commerce system.
- */
+
 public class Customer {
     int customerId;
     String name;
     String email;
 
-    // كل العملاء تُخزّن هنا
     static LinkedList<Customer> customers = new LinkedList<Customer>();
 
     public Customer(int customerId, String name, String email) {
@@ -20,11 +13,12 @@ public class Customer {
         this.email = email;
     }
 
+
     public String toString() {
         return "[" + customerId + "] " + name + " - " + email;
     }
 
-    // عمليات عامة على العملاء
+
     public static void addCustomer(Customer c) {
         if (customers.empty()) {
             customers.insert(c);
@@ -173,8 +167,8 @@ public class Customer {
         }
     }
 
-    // Customer adds a review to a product
-    // Time Complexity: O(R) where R is total number of reviews (to find new review ID)
+
+
     public static void addReviewToProduct(int customerId, int productId, double rating, String comment) {
         // Validate customer exists
         Customer customer = searchById(customerId);
@@ -220,8 +214,7 @@ public class Customer {
         System.out.println("Review added successfully. Review ID: " + newReviewId);
     }
 
-    // Get all reviews by a specific customer
-    // Time Complexity: O(R) where R is total number of reviews
+
     public static void printCustomerReviews(int customerId) {
         // Validate customer exists
         Customer customer = searchById(customerId);

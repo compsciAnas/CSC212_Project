@@ -1,11 +1,5 @@
 package projectFiles;
-/**
- * Project 212 - E-Commerce System
- * Version: 2.0
- * Last Updated: 2025-01-27
- * 
- * CSV file reader for loading products, customers, and orders.
- */
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
