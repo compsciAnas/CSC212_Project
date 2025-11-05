@@ -9,14 +9,17 @@ This diagram describes the classes and their relationships. The system is built 
 classDiagram
     class LinkedList~T~ {
         -Node~T~ head
-        -Node~T~ tail
-        -int size
-        +add(T data) O(1)
-        +remove(T data) O(n)
-        +size() O(1)
-        +isEmpty() O(1)
-        +iterator() O(1)
+        -Node~T~ current
+        +insert(T data)
+        +remove()
+        +retrieve()
+        +update(T data)
+        +findFirst()
+        +findNext()
+        +last()
+        +empty()
     }
+    
     class Node~T~ {
         -T data
         -Node~T~ next
@@ -28,93 +31,72 @@ classDiagram
         -double price
         -int stock
         -LinkedList~Review~ reviews
-        -static LinkedList~Product~ allProducts
-        +addReview(Review r) O(1)
-        +getAverageRating() O(R_avg)
-        +static addOrUpdateProduct(Product p) O(P)
-        +static removeProduct(int id) O(P)
-        +static findById(int id) O(P)
-        +static findByName(String name) O(P)
-        +static getOutOfStockProducts() O(P)
-        +static getAverageRatingReport() O(P*R_avg)
-        +static getTop3ProductsByRating() O(P^2 + P*R_avg)
+        -static LinkedList~Product~ products
+        +addProduct(Product p)
+        +searchById(int id)
+        +updateProduct(int id, double price, int stock)
+        +removeProduct(int id)
+        +printAll()
+        +printOutOfStock()
+        +topThreeProducts()
+        +addReview(Review r)
+        +getAverageRating()
+        +toString()
     }
     
     class Customer {
         -int customerId
         -String name
         -String email
-        -LinkedList~Order~ orders
-        -static LinkedList~Customer~ allCustomers
-        +addOrder(Order o) O(1)
-        +addReview(int pId, int r, String c) O(P+R)
-        +placeNewOrder(LinkedList~Integer~ pIds) O(M + L*P)
-        +printOrderHistory() O(O_cust)
-        +static addCustomer(Customer c) O(C)
-        +static findById(int id) O(C)
+        -static LinkedList~Customer~ customers
+        +addCustomer(Customer c)
+        +searchById(int id)
+        +printAll()
+        +updateCustomer(int id, String name, String email)
+        +placeOrder(int cId, int pId, int qty, String date)
+        +viewOrderHistory(int cId)
+        +addReviewToProduct(int cId, int pId, double rating, String comment)
+        +printCustomerReviews(int cId)
+        +toString()
     }
     
     class Order {
         -int orderId
-        -int customerId
-        -LinkedList~Integer~ productIds
+        -Customer customer
+        -LinkedList~Product~ products
         -double totalPrice
         -String orderDate
         -String status
-        -static LinkedList~Order~ allOrders
-        +static createOrder(Order o) O(1)
-        +static cancelOrder(int id) O(M+P*L)
-        +static updateOrderStatus(int id, String s) O(M)
-        +static findById(int id) O(M)
-        +static getOrdersBetweenDates(String d1, String d2) O(M)
+        -static LinkedList~Order~ orders
+        +addOrder(Order o)
+        +printAll()
+        +printOrdersBetween(String start, String end)
+        +searchById(int id)
+        +updateOrderStatus(int id, String status)
+        +cancelOrder(int id)
+        +toString()
     }
     
     class Review {
         -int reviewId
-        -int productId
-        -int customerId
-        -int rating
+        -Product product
+        -Customer customer
         -String comment
+        -double rating
         -static LinkedList~Review~ allReviews
-        +static addReview(Review r) O(1+P)
-        +static editReview(int id, int r, String c) O(R)
-        +static getCommonHighRatedProducts(int c1, int c2) O(R*R_cust + P*R_avg)
-        -static getProductsReviewedBy(int cId) O(R*R_cust)
+        +addReview(Review r)
+        +printAll()
+        +getReviewsByCustomer(int cId)
+        +getCommonHighRatedProducts(int c1, int c2)
+        +toString()
     }
 
-    class SimpleCSVReader {
-        +static loadProducts(String f)
-        +static loadCustomers(String f)
-        +static loadOrders(String f)
-        +static loadReviews(String f)
-        +static loadAllData()
-    }
-    
-    class SimpleECommerceTest {
-        +static main(String[] args)
-    }
-
-    LinkedList --o "1" Node : (head)
-    LinkedList --o "1" Node : (tail)
-    
-    Product "1" --o "*" Review : (reviews)
-    Customer "1" --o "*" Order : (orders)
-    
-    Product ..> "static" LinkedList : allProducts
-    Customer ..> "static" LinkedList : allCustomers
-    Order ..> "static" LinkedList : allOrders
-    Review ..> "static" LinkedList : allReviews
-    
-    SimpleCSVReader ..> Product : (uses static methods)
-    SimpleCSVReader ..> Customer : (uses static methods)
-    SimpleCSVReader ..> Order : (uses static methods)
-    SimpleCSVReader ..> Review : (uses static methods)
-    
-    SimpleECommerceTest ..> SimpleCSVReader : (calls)
-    SimpleECommerceTest ..> Product : (uses static methods)
-    SimpleECommerceTest ..> Customer : (uses static methods)
-    SimpleECommerceTest ..> Order : (uses static methods)
-    SimpleECommerceTest ..> Review : (uses static methods)
+    LinkedList "1" o-- "1" Node
+    Product "1" o-- "*" Review
+    Order "*" o-- "1" Customer
+    Order "1" o-- "*" Product
+    Review "*" o-- "1" Product
+    Review "*" o-- "1" Customer
 
 
 2. Data Structure
@@ -131,76 +113,123 @@ Search Results: Methods return new LinkedList instances containing results.
 
 Product Operations
 
-Product.addOrUpdateProduct(Product p): Adds a new product or updates an existing one.
+Product.addProduct(Product p): Adds a new product to the system.
 
-Product.removeProduct(int id): Removes a product from the system.
+Product.searchById(int id): Finds a product by its ID (linear search) - Time: O(P).
 
-Product.findById(int id): Finds a product by its ID (linear search).
+Product.updateProduct(int id, double newPrice, int newStock): Updates a product's price and stock.
 
-Product.findByName(String name): Finds a product by its name (linear search).
+Product.removeProduct(int id): Removes a product from the system - Time: O(P).
 
-Product.getOutOfStockProducts(): Returns a list of products with stock <= 0.
+Product.printAll(): Prints all products in the system.
+
+Product.printOutOfStock(): Prints all products with stock <= 0 - Time: O(P).
+
+Product.topThreeProducts(): Displays top 3 products by rating using Bubble Sort - Time: O(P² + P*R_avg).
+
+Product.getAverageRating(): (Instance method) Calculates the average rating for one product - Time: O(R_avg).
 
 Customer Operations
 
-Customer.addCustomer(Customer c): Registers a new customer.
+Customer.addCustomer(Customer c): Registers a new customer in the system.
 
-Customer.findById(int id): Finds a customer by their ID.
+Customer.searchById(int id): Finds a customer by their ID - Time: O(C).
 
-Customer.placeNewOrder(LinkedList<Integer> pIds): Creates a new order for the customer, calculates the price, and reduces product stock.
+Customer.placeOrder(int customerId, int productId, int quantity, String orderDate): Creates a new order for a specific product, validates stock, calculates total price, reduces product stock, and assigns "pending" status - Time: O(C + P + M).
 
-Customer.printOrderHistory(): Prints all orders for a specific customer.
+Customer.viewOrderHistory(int customerId): Prints all orders for a specific customer - Time: O(M).
+
+Customer.addReviewToProduct(int customerId, int productId, double rating, String comment): Allows a customer to add a review for a product - Time: O(C + P + R).
+
+Customer.printCustomerReviews(int customerId): Prints all reviews written by a specific customer - Time: O(C + R).
+
+Customer.updateCustomer(int id, String newName, String newEmail): Updates customer information.
+
+Customer.printAll(): Prints all customers in the system.
 
 Order Operations
 
-Order.createOrder(Order o): Adds a new order to the system (called by placeNewOrder).
+Order.addOrder(Order o): Adds a new order to the system (called by Customer.placeOrder).
 
-Order.cancelOrder(int id): Cancels an order and restores product stock.
+Order.searchById(int id): Finds an order by its ID - Time: O(M).
 
-Order.updateOrderStatus(int id, String status): Updates an order's status.
+Order.cancelOrder(int id): Cancels an order, restores product stock for all products in the order, and updates status to "canceled" - Time: O(M + L*P + L²).
 
-Order.findById(int id): Finds an order by its ID.
+Order.updateOrderStatus(int id, String status): Updates an order's status (pending/shipped/delivered/canceled) - Time: O(M).
+
+Order.printAll(): Prints all orders in the system.
+
+Order.printOrdersBetween(String startDate, String endDate): Prints orders within a date range - Time: O(M).
 
 Review Operations
 
 Review.addReview(Review r): Adds a new review to the system and links it to the corresponding product.
 
-Review.editReview(int id, int rating, String comment): Modifies an existing review.
+Review.getReviewsByCustomer(int customerId): Returns all reviews written by a specific customer - Time: O(R).
 
-Product.getAverageRating(): (Instance method) Calculates the average rating for one product.
+Review.getCommonHighRatedProducts(int custId1, int custId2): Returns products that both customers reviewed with average rating > 4.0 - Time: O(R * R_cust + P * R_avg).
 
-4. Implemented Business Queries
+Review.printAll(): Prints all reviews in the system.
 
-The following four advanced business queries from the project requirements are fully implemented:
+4. Implemented Business Queries & Interactive Features
 
-Average Rating for All Products:
+The following advanced business queries and interactive features are fully implemented in the SimpleECommerceTest menu system:
 
-Product.getAverageRatingReport(): Returns a LinkedList<String> with the average rating for every product.
+View All Data:
+- View all products (Option 1)
+- View all customers (Option 2)
+- View all orders (Option 3)
+- View all reviews (Option 4)
 
-Top 3 Products by Rating:
+Product Queries:
+- **Out of Stock Products** (Option 5): Product.printOutOfStock() - Displays all products with stock <= 0
+- **Top 3 Products by Rating** (Option 6): Product.topThreeProducts() - Displays the 3 highest-rated products using Bubble Sort (O(P² + P*R_avg))
 
-Product.getTop3ProductsByRating(): Returns a LinkedList<Product> containing the 3 highest-rated products, sorted using Bubble Sort.
+Order Queries:
+- **Orders Between Two Dates** (Option 7): Order.printOrdersBetween(startDate, endDate) - Displays orders within a specified date range (O(M))
 
-All Orders Between Two Dates:
+Review Operations:
+- **Add Review to Product** (Option 8): Customer.addReviewToProduct() - Allows customers to submit product reviews with ratings 1-5
+- **View Customer Reviews** (Option 9): Customer.printCustomerReviews() - Displays all reviews written by a specific customer
 
-Order.getOrdersBetweenDates(String startDate, String endDate): Returns a LinkedList<Order> where the order date is between the two given dates (inclusive).
+Advanced Query:
+- **Common High-Rated Products** (Option 10): Review.getCommonHighRatedProducts(custId1, custId2) - Returns products that both customers reviewed with overall average rating > 4.0 (O(R * R_cust + P * R_avg))
 
-Common High-Rated Products:
-
-Review.getCommonHighRatedProducts(int custId1, int custId2): Returns a LinkedList<Product> of products that both customers have reviewed and that have an overall average rating greater than 4.0.
+Order Management:
+- **Place an Order** (Option 11): Customer.placeOrder() - Creates new orders with stock validation, automatic order ID generation, and "pending" status
+- **Cancel an Order** (Option 12): Order.cancelOrder() - Cancels orders and automatically restores product stock
+- **Update Order Status** (Option 13): Order.updateOrderStatus() - Updates order status (pending/shipped/delivered/canceled)
 
 5. Project Structure
 
-Project_212/
-└── src/
-    └── projectFiles/
-        ├── Customer.java
-        ├── LinkedList.java
-        ├── Order.java
-        ├── Product.java
-        ├── Review.java
-        ├── SimpleCSVReader.java
-        └── SimpleECommerceTest.java
+CSC212_Project/
+├── src/
+│   └── projectFiles/
+│       ├── Customer.java
+│       ├── LinkedList.java
+│       ├── List.java
+│       ├── Node.java
+│       ├── Order.java
+│       ├── Product.java
+│       ├── Review.java
+│       ├── SimpleCSVReader.java
+│       └── SimpleECommerceTest.java
+├── customers.csv
+├── products.csv
+├── orders.csv
+├── reviews.csv
+└── README.md
+
+How to Run:
+
+1. Ensure all CSV files (customers.csv, products.csv, orders.csv, reviews.csv) are in the project root directory
+2. Compile all Java files in the projectFiles package
+3. Run SimpleECommerceTest.java
+4. Use the interactive menu to perform operations:
+   - View data (products, customers, orders, reviews)
+   - Execute business queries (top products, date ranges, common reviews)
+   - Manage orders (place, cancel, update status)
+   - Add and view reviews
 
 
 6. Algorithm Complexity Analysis
@@ -231,71 +260,377 @@ size(), isEmpty(): Time: O(1)
 
 iterator(), forEach loop: Time: O(n)
 
-Standard Operations
+Complete Method-by-Method Time Complexity Analysis
 
-Product.findById(id): Time: O(P)
+Product Class Methods:
 
-Customer.findById(id): Time: O(C)
+Product.addProduct(Product p):
+Time Complexity: O(P)
+Space Complexity: O(1)
+Analysis: Traverses to the end of the products LinkedList to insert at tail position. No additional data structures created.
 
-Order.findById(id): Time: O(M)
+Product.searchById(int id):
+Time Complexity: O(P)
+Space Complexity: O(1)
+Analysis: Linear search through all P products to find matching ID. Uses only a few local variables.
 
-Product.findByName(name): Time: O(P)
+Product.updateProduct(int id, double newPrice, int newStock):
+Time Complexity: O(P)
+Space Complexity: O(1)
+Analysis: Calls searchById(O(P)) then updates fields in O(1). No additional data structures.
 
-Customer.placeNewOrder(pIds): Time: O(M + L*P)
+Product.removeProduct(int id):
+Time Complexity: O(P)
+Space Complexity: O(1)
+Analysis: Linear search through products list to find and remove the matching product. In-place removal.
 
-Analysis: O(M) to find a new Order ID + O(L*P) to iterate L product IDs and call Product.findById(O(P)) for each one.
+Product.printAll():
+Time Complexity: O(P)
+Space Complexity: O(1)
+Analysis: Iterates through all P products once and prints each. No additional storage needed.
 
-Customer.addReview(...): Time: O(P + R)
+Product.printOutOfStock():
+Time Complexity: O(P)
+Space Complexity: O(1)
+Analysis: Iterates through all P products, checking stock field for each. Prints directly without storing results.
 
-Analysis: O(P) to find the product + O(R) to find a new Review ID.
-
-Order.cancelOrder(id): Time: O(M + L*P)
-
-Analysis: O(M) to find the order + O(L*P) to iterate L products in the order and call Product.findById(O(P)) for each to restore stock.
-
-Business Query Analysis
-
-Average Rating for All Products (Product.getAverageRatingReport)
-
-Time Complexity: O(P * R_avg) (or O(P + R))
-
-Analysis: The method iterates through all P products (O(P)). For each product, it calls getAverageRating(), which iterates through that product's R_avg reviews (O(R_avg)).
-
-Space Complexity: O(P) (to store the new LinkedList<String> for the report).
-
-Top 3 Products by Rating (Product.getTop3ProductsByRating)
-
+Product.topThreeProducts():
 Time Complexity: O(P² + P*R_avg)
+Space Complexity: O(P)
+Analysis: O(P) to count products, O(P*R_avg) to collect ratings (calls getAverageRating() for each product), O(P²) for Bubble Sort. Creates two temporary arrays of size P (productArray and ratingArray).
 
-Analysis: The dominant factor is the O(P²) Bubble Sort. Inside the sort's nested loops, getAverageRating() (O(R_avg)) is called O(P) times.
+Product.getAverageRating():
+Time Complexity: O(R_avg)
+Space Complexity: O(1)
+Analysis: Iterates through all reviews for this specific product (average R_avg reviews per product). Uses only sum and count variables.
 
-Space Complexity: O(P) (to create the temporary array used for sorting).
+Product.addReview(Review r):
+Time Complexity: O(R_prod)
+Space Complexity: O(1)
+Analysis: Traverses to the end of this product's reviews list (R_prod reviews for this product) to insert at tail. No additional structures.
 
-All Orders Between Two Dates (Order.getOrdersBetweenDates)
+Product.toString():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Constructs string from instance fields only. String creation is O(1) for fixed number of fields.
 
+Customer Class Methods:
+
+Customer.addCustomer(Customer c):
+Time Complexity: O(C)
+Space Complexity: O(1)
+Analysis: Traverses to the end of the customers LinkedList to insert at tail position. No additional data structures created.
+
+Customer.searchById(int id):
+Time Complexity: O(C)
+Space Complexity: O(1)
+Analysis: Linear search through all C customers to find matching ID. Uses only local variables.
+
+Customer.printAll():
+Time Complexity: O(C)
+Space Complexity: O(1)
+Analysis: Iterates through all C customers once and prints each. No additional storage.
+
+Customer.updateCustomer(int id, String newName, String newEmail):
+Time Complexity: O(C)
+Space Complexity: O(1)
+Analysis: Calls searchById(O(C)) then updates fields in O(1). No additional data structures.
+
+Customer.placeOrder(int customerId, int productId, int quantity, String orderDate):
+Time Complexity: O(C + P + M + L)
+Space Complexity: O(L)
+Analysis: O(C) to find the customer + O(P) to find the product + O(M) to generate a new order ID by iterating through all orders + O(L) to create a LinkedList with L copies of the product. Creates new Order object with productList containing L nodes.
+
+Customer.viewOrderHistory(int customerId):
+Time Complexity: O(C + M)
+Space Complexity: O(1)
+Analysis: O(C) to find and validate the customer + O(M) to iterate through all orders and filter by customer ID. Prints directly without storing.
+
+Customer.addReviewToProduct(int customerId, int productId, double rating, String comment):
+Time Complexity: O(C + P + R + R_prod)
+Space Complexity: O(1)
+Analysis: O(C) to find the customer + O(P) to find the product + O(R) to generate a new Review ID + O(R_prod) to add the review to the product's review list. Creates one new Review object (constant space).
+
+Customer.printCustomerReviews(int customerId):
+Time Complexity: O(C + R)
+Space Complexity: O(R_cust)
+Analysis: O(C) to find and validate the customer + O(R) to call getReviewsByCustomer(), which iterates through all reviews to find matches. Creates new LinkedList containing R_cust reviews for this customer.
+
+Customer.toString():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Constructs string from instance fields only. Fixed number of fields.
+
+Order Class Methods:
+
+Order.addOrder(Order o):
 Time Complexity: O(M)
+Space Complexity: O(1)
+Analysis: Traverses to the end of the orders LinkedList to insert at tail position. No additional data structures created.
 
-Analysis: The method iterates through the allOrders list (size M) exactly once, performing an O(1) string comparison for each order.
+Order.printAll():
+Time Complexity: O(M * L)
+Space Complexity: O(1)
+Analysis: Iterates through all M orders. For each order, toString() iterates through L products in the order to build the product list string. Prints directly without storing.
 
-Space Complexity: O(M) (in the worst case, all orders match and are added to the results list).
+Order.printOrdersBetween(String startDate, String endDate):
+Time Complexity: O(M * L)
+Space Complexity: O(1)
+Analysis: Iterates through all M orders, performs O(1) date comparison for each, and calls toString() (O(L)) for matching orders. No additional storage.
 
-Common High-Rated Products (Review.getCommonHighRatedProducts)
+Order.searchById(int id):
+Time Complexity: O(M)
+Space Complexity: O(1)
+Analysis: Linear search through all M orders to find matching ID. Uses only local variables.
 
-Time Complexity: O(R * R_cust + P * R_avg)
+Order.updateOrderStatus(int id, String newStatus):
+Time Complexity: O(M)
+Space Complexity: O(1)
+Analysis: Calls searchById(O(M)) then updates status field in O(1) after validating the status string (O(1)). No additional structures.
 
-Analysis: This is the most complex query.
+Order.cancelOrder(int id):
+Time Complexity: O(M + L² + L*P)
+Space Complexity: O(L)
+Analysis: O(M) to find the order + O(L²) for counting occurrences of each product using nested LinkedList traversals (for each of L products, search through previously counted products) + O(L*P) to restore stock by calling Product.searchById(O(P)) for each unique product. Creates two temporary LinkedLists: productIds and counts, each with up to L elements.
 
-getProductsReviewedBy(c1): O(R * R_cust). It iterates all R reviews, and for each of c1's R_cust reviews, it calls listContains (O(R_cust)).
+Order.toString():
+Time Complexity: O(L)
+Space Complexity: O(L)
+Analysis: Iterates through all L products in the order to build product names string. StringBuilder internally allocates space proportional to the number of product names.
 
-getProductsReviewedBy(c2): O(R * R_cust).
+Review Class Methods:
 
-Find Intersection: O(R_cust * R_cust).
+Review.addReview(Review r):
+Time Complexity: O(R)
+Space Complexity: O(1)
+Analysis: Traverses to the end of the allReviews LinkedList to insert at tail position. No additional data structures created.
 
-Filter by Rating: O(P * R_avg) in the worst case (if all products are common).
+Review.printAll():
+Time Complexity: O(R)
+Space Complexity: O(1)
+Analysis: Iterates through all R reviews once and prints each. Prints directly without storing.
 
-The dominant term is O(R * R_cust).
+Review.getReviewsByCustomer(int customerId):
+Time Complexity: O(R)
+Space Complexity: O(R_cust)
+Analysis: Iterates through all R reviews, checking customer ID for each, and adds matches to a new LinkedList. Creates new LinkedList containing R_cust reviews for this customer.
 
-Space Complexity: O(R_cust) (to store the lists of product IDs for both customers).
+Review.getCommonHighRatedProducts(int cust1, int cust2):
+Time Complexity: O(R*R_cust + R_cust² + P*R_avg)
+Space Complexity: O(R_cust + P_common)
+Analysis: O(R*R_cust) to get products reviewed by customer 1 (iterates all R reviews, for each match performs O(R_cust) duplicate check), O(R*R_cust) for customer 2, O(R_cust²) to find intersection of two lists, O(P*R_avg) in worst case to filter by rating > 4.0 (calls getAverageRating() for each common product). Creates LinkedLists for products reviewed by customer 1 (R_cust space), customer 2 (R_cust space), and common products (P_common space).
+
+Review.toString():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Constructs string from instance fields only. Fixed number of fields.
+
+SimpleCSVReader Class Methods:
+
+SimpleCSVReader.loadProducts(String filename):
+Time Complexity: O(P_file * P)
+Space Complexity: O(1) per iteration
+Analysis: Reads P_file lines from file and calls Product.addProduct() for each (O(P) per call because it traverses to end of list). At startup when list is initially empty, this is O(1) + O(2) + O(3) + ... + O(P) = O(P²). Each line is processed with temporary String variables only.
+
+SimpleCSVReader.loadCustomers(String filename):
+Time Complexity: O(C_file * C)
+Space Complexity: O(1) per iteration
+Analysis: Reads C_file lines from file and calls Customer.addCustomer() for each (O(C) per call). Similar to loadProducts, total is O(C²) when building list from empty. Uses temporary String variables per line.
+
+SimpleCSVReader.loadOrders(String filename):
+Time Complexity: O(M_file * (C + P*L + M))
+Space Complexity: O(L) per order
+Analysis: Reads M_file lines from file. For each order: O(C) to find customer, O(L*P) to find L products and build product list, O(M) to add order. Creates LinkedList of L products for each order.
+
+SimpleCSVReader.loadReviews(String filename):
+Time Complexity: O(R_file * (P + C + R))
+Space Complexity: O(1) per iteration
+Analysis: Reads R_file lines from file. For each review: O(P) to find product, O(C) to find customer, O(R) to add review, O(R_prod) to add to product's review list. Creates one Review object per line (constant space per iteration).
+
+LinkedList<T> Data Structure Operations:
+
+LinkedList.insert(T data):
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Inserts at current position in constant time. Creates one new Node object.
+
+LinkedList.remove():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Removes element at current position in constant time. Updates pointers only.
+
+LinkedList.retrieve():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Returns element at current position. No allocation, just returns reference.
+
+LinkedList.update(T data):
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Updates element at current position. Replaces data reference only.
+
+LinkedList.findFirst():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Moves current pointer to head. Updates one pointer variable.
+
+LinkedList.findNext():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Moves current pointer to next node. Updates one pointer variable.
+
+LinkedList.last():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Checks if current pointer is at tail. Compares two pointers.
+
+LinkedList.empty():
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Checks if list is empty by comparing head to null. Single comparison.
+
+Interactive Menu Operations Time Complexity Analysis
+
+Option 1 - View All Products (Product.printAll):
+Time Complexity: O(P)
+Space Complexity: O(1)
+Analysis: Single pass through all products to print each one.
+
+Option 2 - View All Customers (Customer.printAll):
+Time Complexity: O(C)
+Space Complexity: O(1)
+Analysis: Single pass through all customers to print each one.
+
+Option 3 - View All Orders (Order.printAll):
+Time Complexity: O(M * L)
+Space Complexity: O(1)
+Analysis: Iterates through all M orders, each requiring O(L) to format product list in toString().
+
+Option 4 - View All Reviews (Review.printAll):
+Time Complexity: O(R)
+Space Complexity: O(1)
+Analysis: Single pass through all reviews to print each one.
+
+Option 5 - View Out of Stock Products (Product.printOutOfStock):
+Time Complexity: O(P)
+Space Complexity: O(1)
+Analysis: Single pass through all products, checking stock <= 0 for each.
+
+Option 6 - View Top 3 Rated Products (Product.topThreeProducts):
+Time Complexity: O(P² + P*R_avg)
+Space Complexity: O(P)
+Analysis: O(P) to count, O(P*R_avg) to collect ratings (getAverageRating() called P times), O(P²) for Bubble Sort. Creates temporary arrays of size P.
+
+Option 7 - View Orders Between Dates (Order.printOrdersBetween):
+Time Complexity: O(M * L)
+Space Complexity: O(1)
+Analysis: Single pass through M orders with O(1) date comparison, O(L) toString() for matches.
+
+Option 8 - Add Review to Product (Customer.addReviewToProduct):
+Time Complexity: O(C + P + R + R_prod)
+Space Complexity: O(1)
+Analysis: O(C) find customer, O(P) find product, O(R) generate review ID, O(R_prod) add to product's review list.
+
+Option 9 - View Customer Reviews (Customer.printCustomerReviews):
+Time Complexity: O(C + R)
+Space Complexity: O(R_cust)
+Analysis: O(C) find customer, O(R) iterate all reviews to find matches. Creates new list with R_cust reviews.
+
+Option 10 - View Common High-Rated Products (Review.getCommonHighRatedProducts):
+Time Complexity: O(R*R_cust + R_cust² + P*R_avg)
+Space Complexity: O(R_cust + P_common)
+Analysis: Most complex query. O(R*R_cust) to get products reviewed by each customer (with duplicate checking), O(R_cust²) to find intersection, O(P_common*R_avg) to filter by rating > 4.0. Creates lists for products reviewed by each customer and common products.
+
+Option 11 - Place an Order (Customer.placeOrder):
+Time Complexity: O(C + P + M + L)
+Space Complexity: O(L)
+Analysis: O(C) find customer, O(P) find product, O(M) generate order ID, O(L) create product list with quantity L copies. Creates new Order object with LinkedList of L products.
+
+Option 12 - Cancel an Order (Order.cancelOrder):
+Time Complexity: O(M + L² + L*P)
+Space Complexity: O(L)
+Analysis: O(M) find order, O(L²) count product occurrences with nested list traversals, O(L*P) restore stock for unique products. Creates temporary lists for product IDs and counts.
+
+Option 13 - Update Order Status (Order.updateOrderStatus):
+Time Complexity: O(M)
+Space Complexity: O(1)
+Analysis: O(M) to find order by ID, O(1) to validate and update status field.
+
+Option 14 - Exit:
+Time Complexity: O(1)
+Space Complexity: O(1)
+Analysis: Closes scanner and returns from main method.
+
+Complexity Summary by Operation Type:
+
+TIME COMPLEXITY CATEGORIES:
+
+Constant Time O(1) Operations:
+- All LinkedList basic operations (insert, remove, retrieve, update, findFirst, findNext, last, empty)
+- All toString() methods (except Order.toString which is O(L))
+- Field updates after object is found
+- Status validation
+
+Linear Time O(n) Operations:
+- All search operations (searchById methods): O(P), O(C), O(M)
+- All printAll operations: O(P), O(C), O(R)
+- Single-pass filters (out of stock, date range): O(P), O(M)
+- Review filtering by customer: O(R)
+- Adding to end of list: O(n) where n is current list size
+
+Quadratic Time O(n²) Operations:
+- Bubble Sort in topThreeProducts: O(P²)
+- Product occurrence counting in cancelOrder: O(L²)
+- Intersection finding in getCommonHighRatedProducts: O(R_cust²)
+- CSV file loading (building list from empty): O(P²), O(C²), etc.
+
+Complex Multi-Step Operations (Combined Complexity):
+- placeOrder: O(C + P + M + L) - Multiple sequential searches + list creation
+- cancelOrder: O(M + L² + L*P) - Search + nested counting + stock restoration
+- addReviewToProduct: O(C + P + R + R_prod) - Multiple searches + insertions
+- getCommonHighRatedProducts: O(R*R_cust + R_cust² + P*R_avg) - Multiple filters + intersection
+- loadOrders: O(M_file * (C + P*L + M)) - File I/O with multiple lookups per line
+
+Most Expensive Operations (Worst Case Time):
+1. Review.getCommonHighRatedProducts: O(R*R_cust + R_cust² + P*R_avg)
+2. Product.topThreeProducts: O(P² + P*R_avg)
+3. SimpleCSVReader.loadProducts: O(P²) when building list
+4. Order.cancelOrder: O(M + L² + L*P)
+5. SimpleCSVReader.loadOrders: O(M_file * (C + P*L + M))
+
+SPACE COMPLEXITY CATEGORIES:
+
+Constant Space O(1) Operations:
+- All LinkedList pointer operations (no new nodes created)
+- All search operations (use only local variables)
+- All update operations (modify existing objects)
+- All print operations (no result storage)
+- toString() methods (except Order which is O(L))
+- Status validation and field updates
+
+Linear Space O(n) Operations:
+- Product.topThreeProducts: O(P) for temporary arrays
+- Customer.placeOrder: O(L) for product list
+- Order.cancelOrder: O(L) for counting lists
+- Customer.printCustomerReviews: O(R_cust) for result list
+- Review.getReviewsByCustomer: O(R_cust) for result list
+- Order.toString: O(L) for StringBuilder
+- Each Node.insert: O(1) per node, O(n) for n insertions
+
+Complex Space Operations:
+- Review.getCommonHighRatedProducts: O(R_cust + P_common) - Multiple result lists
+- SimpleCSVReader.loadOrders: O(L) per order being processed
+
+Total System Space Complexity:
+- Static LinkedLists: O(P + C + M + R) for all entities
+- Product reviews: O(P * R_avg) total across all products
+- Order products: O(M * L_avg) total across all orders
+
+Space Optimization Notes:
+- Most query operations are space-efficient (O(1) auxiliary space)
+- Result lists are only as large as the filtered results
+- No unnecessary data duplication
+- StringBuilder used for efficient string concatenation
 
 7. CSV File Formats
 

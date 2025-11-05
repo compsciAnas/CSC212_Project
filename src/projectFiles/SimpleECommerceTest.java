@@ -15,14 +15,17 @@ public class SimpleECommerceTest {
             System.out.println("1. View all products");
             System.out.println("2. View all customers");
             System.out.println("3. View all orders");
-            System.out.println("4. View out of stock products");
-            System.out.println("5. View top 3 rated products");
-            System.out.println("6. View orders between dates");
-            System.out.println("7. View all reviews");
+            System.out.println("4. View all reviews");
+            System.out.println("5. View out of stock products");
+            System.out.println("6. View top 3 rated products");
+            System.out.println("7. View orders between dates");
             System.out.println("8. Add review to product");
             System.out.println("9. View customer reviews");
             System.out.println("10. View common high-rated products (rating > 4.0)");
-            System.out.println("11. Exit");
+            System.out.println("11. Place an order");
+            System.out.println("12. Cancel an order");
+            System.out.println("13. Update order status");
+            System.out.println("14. Exit");
             System.out.print("Choose option: ");
 
             int choice = scan.nextInt();
@@ -39,20 +42,20 @@ public class SimpleECommerceTest {
                     Order.printAll();
                     break;
                 case 4:
-                    Product.printOutOfStock();
+                    Review.printAll();
                     break;
                 case 5:
-                    Product.topThreeProducts();
+                    Product.printOutOfStock();
                     break;
                 case 6:
+                    Product.topThreeProducts();
+                    break;
+                case 7:
                     System.out.print("Enter start date (YYYY-MM-DD): ");
                     String start = scan.nextLine();
                     System.out.print("Enter end date (YYYY-MM-DD): ");
                     String end = scan.nextLine();
                     Order.printOrdersBetween(start, end);
-                    break;
-                case 7:
-                    Review.printAll();
                     break;
                 case 8:
                     System.out.print("Enter customer ID: ");
@@ -91,6 +94,31 @@ public class SimpleECommerceTest {
                     }
                     break;
                 case 11:
+                    System.out.print("Enter customer ID: ");
+                    int placeCustomerId = scan.nextInt();
+                    System.out.print("Enter product ID: ");
+                    int placeProductId = scan.nextInt();
+                    System.out.print("Enter quantity: ");
+                    int quantity = scan.nextInt();
+                    scan.nextLine(); // Consume newline
+                    System.out.print("Enter order date (YYYY-MM-DD): ");
+                    String orderDate = scan.nextLine();
+                    Customer.placeOrder(placeCustomerId, placeProductId, quantity, orderDate);
+                    break;
+                case 12:
+                    System.out.print("Enter order ID to cancel: ");
+                    int cancelId = scan.nextInt();
+                    Order.cancelOrder(cancelId);
+                    break;
+                case 13:
+                    System.out.print("Enter order ID to update: ");
+                    int updateId = scan.nextInt();
+                    scan.nextLine();
+                    System.out.print("Enter new status (pending/shipped/delivered/canceled): ");
+                    String newStatus = scan.nextLine();
+                    Order.updateOrderStatus(updateId, newStatus);
+                    break;
+                case 14:
                     System.out.println("Exiting program.");
                     scan.close();
                     return;
