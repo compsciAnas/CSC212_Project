@@ -180,6 +180,7 @@ public class SimpleCSVReader {
                     
                     if (p != null && c != null) {
                         Review review = new Review(reviewId, p, c, comment, rating);
+                        Review.addReview(review);
                         p.addReview(review);
                     } else {
                         if (p == null) System.out.println("Product not found for review: " + productId);
