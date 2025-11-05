@@ -172,4 +172,77 @@ public class Customer {
             System.out.println("No orders found for this customer.");
         }
     }
+
+    // Customer adds a review to a product
+    // Time Complexity: O(R) where R is total number of reviews (to find new review ID)
+    public static void addReviewToProduct(int customerId, int productId, double rating, String comment) {
+        // Validate customer exists
+        Customer customer = searchById(customerId);
+        if (customer == null) {
+            System.out.println("Customer not found.");
+            return;
+        }
+
+        // Validate product exists
+        Product product = Product.searchById(productId);
+        if (product == null) {
+            System.out.println("Product not found.");
+            return;
+        }
+
+        // Validate rating
+        if (rating < 1 || rating > 5) {
+            System.out.println("Invalid rating. Rating must be between 1 and 5.");
+            return;
+        }
+
+        // Generate new review ID
+        int newReviewId = 1;
+        if (!Review.allReviews.empty()) {
+            Review.allReviews.findFirst();
+            int maxId = 0;
+            while (Review.allReviews.retrieve() != null) {
+                Review r = Review.allReviews.retrieve();
+                if (r.reviewId > maxId) {
+                    maxId = r.reviewId;
+                }
+                if (Review.allReviews.last()) break;
+                Review.allReviews.findNext();
+            }
+            newReviewId = maxId + 1;
+        }
+
+        // Create and add review
+        Review newReview = new Review(newReviewId, product, customer, comment, rating);
+        Review.addReview(newReview);
+        product.addReview(newReview);
+
+        System.out.println("Review added successfully. Review ID: " + newReviewId);
+    }
+
+    // Get all reviews by a specific customer
+    // Time Complexity: O(R) where R is total number of reviews
+    public static void printCustomerReviews(int customerId) {
+        // Validate customer exists
+        Customer customer = searchById(customerId);
+        if (customer == null) {
+            System.out.println("Customer not found.");
+            return;
+        }
+
+        LinkedList<Review> customerReviews = Review.getReviewsByCustomer(customerId);
+        
+        if (customerReviews.empty()) {
+            System.out.println("No reviews found for customer " + customer.name + ".");
+            return;
+        }
+
+        System.out.println("Reviews by " + customer.name + " (ID: " + customerId + "):");
+        customerReviews.findFirst();
+        while (customerReviews.retrieve() != null) {
+            System.out.println(customerReviews.retrieve());
+            if (customerReviews.last()) break;
+            customerReviews.findNext();
+        }
+    }
 }
