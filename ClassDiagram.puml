@@ -1,27 +1,54 @@
-@startuml
+```mermaid
+classDiagram
+    class List {
+        +void addElement(Element e)
+        +void removeElement(Element e)
+        +Element getElement(int index)
+        +int size()
+    }
 
-class User {
-    +String name
-    +String email
-    +login()
-    +logout()
-}
+    class LinkedList {
+        -Node head
+        +void addElement(Element e)
+        +void removeElement(Element e)
+        +Element getElement(int index)
+        +int size()
+    }
 
-class Course {
-    +String courseName
-    +String courseCode
-    +addUser()
-    +removeUser()
-}
+    class Node {
+        -Element data
+        -Node next
+    }
 
-class Enrollment {
-    +User user
-    +Course course
-    +enroll()
-    +drop()
-}
+    class Customer {
+        +String name
+        +String email
+        +String address
+        +void placeOrder(Order o)
+    }
 
-User "1" -- "*" Enrollment
-Course "1" -- "*" Enrollment
+    class Order {
+        +int orderId
+        +Customer customer
+        +ArrayList<Product> products
+        +void calculateTotal()
+    }
 
-@enduml
+    class Product {
+        +String name
+        +double price
+        +String description
+    }
+
+    class Review {
+        +String rating
+        +String comment
+        +Product product
+    }
+
+    List <|-- LinkedList
+    LinkedList --> Node
+    Customer --> Order
+    Order --> Product
+    Product --> Review
+```
