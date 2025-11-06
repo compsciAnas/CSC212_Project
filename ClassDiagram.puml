@@ -1,54 +1,127 @@
 ```mermaid
 classDiagram
-    class List {
-        +void addElement(Element e)
-        +void removeElement(Element e)
-        +Element getElement(int index)
-        +int size()
+    %% Interface
+    class List~T~ {
+        <<interface>>
+        +boolean empty()
+        +boolean last()
+        +void findFirst()
+        +void findNext()
+        +T retrieve()
+        +void update(T e)
+        +void insert(T e)
+        +void remove()
     }
 
-    class LinkedList {
-        -Node head
-        +void addElement(Element e)
-        +void removeElement(Element e)
-        +Element getElement(int index)
-        +int size()
+    %% Data Structure Classes
+    class Node~T~ {
+        +T data
+        +Node~T~ next
+        +Node(T data)
     }
 
-    class Node {
-        -Element data
-        -Node next
+    class LinkedList~T~ {
+        -Node~T~ head
+        -Node~T~ current
+        +LinkedList()
+        +boolean empty()
+        +boolean last()
+        +void findFirst()
+        +void findNext()
+        +T retrieve()
+        +void update(T e)
+        +void insert(T e)
+        +void remove()
+        +Node~T~ getHead()
     }
 
+    %% Business Logic Classes
     class Customer {
+        +int customerId
         +String name
         +String email
-        +String address
-        +void placeOrder(Order o)
+        +LinkedList~Customer~ customers$
+        +Customer(int, String, String)
+        +String toString()
+        +boolean addCustomer(Customer)$
+        +Customer searchById(int)$
+        +void printAll()$
+        +void updateCustomer(int, String, String)$
+        +void placeOrder(int, int, int, String)$
+        +void viewOrderHistory(int)$
+        +void addReviewToProduct(int, int, double, String)$
+        +void printCustomerReviews(int)$
+    }
+
+    class Product {
+        +int productId
+        +String name
+        +double price
+        +int stock
+        +LinkedList~Review~ reviews
+        +LinkedList~Product~ products$
+        +Product(int, String, double, int)
+        +void addReview(Review)
+        +double getAverageRating()
+        +String toString()
+        +boolean addProduct(Product)$
+        +Product searchById(int)$
+        +Product searchByName(String)$
+        +void updateProduct(int, double, int)$
+        +void removeProduct(int)$
+        +void printAll()$
+        +void printOutOfStock()$
+        +void topThreeProducts()$
     }
 
     class Order {
         +int orderId
         +Customer customer
-        +ArrayList<Product> products
-        +void calculateTotal()
-    }
-
-    class Product {
-        +String name
-        +double price
-        +String description
+        +LinkedList~Product~ products
+        +double totalPrice
+        +String orderDate
+        +String status
+        +LinkedList~Order~ orders$
+        +Order(int, Customer, LinkedList~Product~, double, String, String)
+        +String toString()
+        +void addOrder(Order)$
+        +void printAll()$
+        +void printOrdersBetween(String, String)$
+        +Order searchById(int)$
+        +void updateOrderStatus(int, String)$
+        +void cancelOrder(int)$
     }
 
     class Review {
-        +String rating
-        +String comment
+        +int reviewId
         +Product product
+        +Customer customer
+        +String comment
+        +double rating
+        +LinkedList~Review~ allReviews$
+        +Review(int, Product, Customer, String, double)
+        +String toString()
+        +void addReview(Review)$
+        +void editReview(int, double, String)$
+        +LinkedList~Review~ getReviewsByCustomer(int)$
+        +LinkedList~Product~ getCommonHighRatedProducts(int, int)$
+        +void printAll()$
     }
 
-    List <|-- LinkedList
-    LinkedList --> Node
-    Customer --> Order
-    Order --> Product
-    Product --> Review
+    %% Relationships
+    List~T~ <|.. LinkedList~T~ : implements
+    LinkedList~T~ o-- Node~T~ : contains
+    
+    Customer "1" -- "0..*" Order : places
+    Order "1" *-- "1..*" Product : contains
+    Product "1" -- "0..*" Review : has
+    Review "1" -- "1" Customer : written by
+    Review "1" -- "1" Product : about
+    
+    Customer o-- LinkedList~Customer~ : stores
+    Product o-- LinkedList~Product~ : stores
+    Product o-- LinkedList~Review~ : stores
+    Order o-- LinkedList~Order~ : stores
+    Order o-- LinkedList~Product~ : contains
+    Review o-- LinkedList~Review~ : stores
 ```
