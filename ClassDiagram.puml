@@ -1,0 +1,27 @@
+@startuml
+
+class User {
+    +String name
+    +String email
+    +login()
+    +logout()
+}
+
+class Course {
+    +String courseName
+    +String courseCode
+    +addUser()
+    +removeUser()
+}
+
+class Enrollment {
+    +User user
+    +Course course
+    +enroll()
+    +drop()
+}
+
+User "1" -- "*" Enrollment
+Course "1" -- "*" Enrollment
+
+@enduml
