@@ -343,13 +343,13 @@ CSC212_Project/
 
 | Data Structure | Phase I | Phase II |
 |---------------|---------|----------|
-| Products | O(P) LinkedList | O(P) AVL + O(P) LinkedList |
-| Customers | O(C) LinkedList | O(C) AVL by ID + O(C) AVL by Name + O(C) LinkedList |
-| Orders | O(M) LinkedList | O(M) AVL by ID + O(M) AVL by Date + O(M) LinkedList |
-| Reviews | O(R) LinkedList | O(R) AVL + O(R) LinkedList |
-| **Total** | **O(P + C + M + R)** | **O(P + C + M + R)** (constant factor increase) |
+| Products | O(P) LinkedList | O(P) AVL + O(P) LinkedList = 2x |
+| Customers | O(C) LinkedList | O(C) AVL by ID + O(C) AVL by Name + O(C) LinkedList = 3x |
+| Orders | O(M) LinkedList | O(M) AVL by ID + O(M) AVL by Date + O(M) LinkedList = 3x |
+| Reviews | O(R) LinkedList | O(R) AVL + O(R) LinkedList = 2x |
+| **Total** | **O(P + C + M + R)** | **O(P + C + M + R)** with ~2-3x memory overhead |
 
-Note: Phase II maintains both AVL Trees and LinkedLists for backward compatibility. In production, LinkedLists could be removed to reduce memory usage.
+Note: Phase II maintains both AVL Trees and LinkedLists for backward compatibility. In production, LinkedLists could be removed to reduce memory usage to O(n) with only AVL Trees.
 
 ---
 
