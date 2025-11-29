@@ -1,10 +1,24 @@
 package projectFiles;
 
+import java.util.Locale;
+
+/**
+ * Customer class - Phase II implementation with AVL Tree storage
+ * Customers are stored in AVL Tree keyed by customer name (alphabetically sorted).
+ * A secondary AVL Tree keyed by customerId supports efficient ID lookups.
+ */
 public class Customer {
     int customerId;
     String name;
     String email;
 
+    // Phase II: AVL Tree keyed by customer name for alphabetical sorting - O(log n) operations
+    static AVLTree<String, Customer> customerTreeByName = new AVLTree<String, Customer>();
+    
+    // Phase II: AVL Tree keyed by customer ID for efficient ID lookups - O(log n) operations
+    static AVLTree<Integer, Customer> customerTreeById = new AVLTree<Integer, Customer>();
+    
+    // Phase I: LinkedList maintained for compatibility
     static LinkedList<Customer> customers = new LinkedList<Customer>();
 
     public Customer(int customerId, String name, String email) {
@@ -19,13 +33,22 @@ public class Customer {
     }
 
 
+    /**
+     * Phase II: Add customer using AVL Tree - O(log n) time complexity
+     */
     public static boolean addCustomer(Customer c) {
-        // Check for duplicate customer ID
+        // Check for duplicate customer ID using AVL search - O(log n)
         if (searchById(c.customerId) != null) {
             System.out.println("Error: Customer ID " + c.customerId + " already exists. Cannot add duplicate customer.");
             return false;
         }
         
+        // Insert into AVL Trees - O(log n) each
+        // Use Locale.ROOT for consistent case-insensitive comparison
+        customerTreeById.insert(c.customerId, c);
+        customerTreeByName.insert(c.name.toLowerCase(Locale.ROOT), c);
+        
+        // Also maintain LinkedList for backward compatibility
         if (customers.empty()) {
             customers.insert(c);
         } else {
@@ -38,7 +61,19 @@ public class Customer {
         return true;
     }
 
+    /**
+     * Phase II: Search customer by ID using AVL Tree - O(log n) time complexity
+     */
     public static Customer searchById(int id) {
+        // Use AVL Tree for O(log n) search
+        return customerTreeById.search(id);
+    }
+    
+    /**
+     * Phase I: Search by ID using LinkedList - O(n) time complexity
+     * Kept for performance comparison
+     */
+    public static Customer searchByIdLinear(int id) {
         if (customers.empty())
             return null;
 
@@ -52,41 +87,92 @@ public class Customer {
         }
         return null;
     }
+    
+    /**
+     * Phase II: Search customer by name using AVL Tree - O(log n) time complexity
+     */
+    public static Customer searchByName(String name) {
+        return customerTreeByName.search(name.toLowerCase(Locale.ROOT));
+    }
 
+    /**
+     * Phase II: Print all customers (unsorted - using LinkedList)
+     */
     public static void printAll() {
-        if (customers.empty()) {
+        if (customerTreeById.isEmpty()) {
             System.out.println("No customers available.");
             return;
         }
 
-        customers.findFirst();
-        while (customers.retrieve() != null) {
-            System.out.println(customers.retrieve());
-            if (customers.last()) break;
-            customers.findNext();
+        // Use in-order traversal for output
+        LinkedList<Customer> allCustomers = customerTreeById.inOrderTraversal();
+        allCustomers.findFirst();
+        while (allCustomers.retrieve() != null) {
+            System.out.println(allCustomers.retrieve());
+            if (allCustomers.last()) break;
+            allCustomers.findNext();
+        }
+    }
+    
+    /**
+     * Phase II: Print all customers sorted alphabetically by name
+     * Uses in-order traversal of name-keyed AVL Tree - O(n)
+     */
+    public static void printAllSortedAlphabetically() {
+        if (customerTreeByName.isEmpty()) {
+            System.out.println("No customers available.");
+            return;
+        }
+
+        System.out.println("Customers (sorted alphabetically by name):");
+        // Use in-order traversal of name tree for sorted output
+        LinkedList<Customer> sortedCustomers = customerTreeByName.inOrderTraversal();
+        sortedCustomers.findFirst();
+        while (sortedCustomers.retrieve() != null) {
+            System.out.println(sortedCustomers.retrieve());
+            if (sortedCustomers.last()) break;
+            sortedCustomers.findNext();
         }
     }
 
+    /**
+     * Phase II: Update customer using AVL Tree - O(log n) for search
+     */
     public static void updateCustomer(int id, String newName, String newEmail) {
-        Customer c = searchById(id);
+        Customer c = searchById(id); // O(log n)
         if (c != null) {
-            c.name = newName;
-            c.email = newEmail;
+            // Need to update the name tree if name changed
+            String oldNameKey = c.name.toLowerCase(Locale.ROOT);
+            String newNameKey = newName.toLowerCase(Locale.ROOT);
+            
+            if (!oldNameKey.equals(newNameKey)) {
+                // Remove from name tree and re-insert with new key
+                customerTreeByName.delete(oldNameKey);
+                c.name = newName;
+                c.email = newEmail;
+                customerTreeByName.insert(newNameKey, c);
+            } else {
+                c.name = newName;
+                c.email = newEmail;
+            }
             System.out.println("Customer updated successfully.");
         } else {
             System.out.println("Customer not found.");
         }
     }
 
+    /**
+     * Phase II: Place an order - uses AVL trees for efficient lookups
+     */
     public static void placeOrder(int customerId, int productId, int quantity, String orderDate) {
-        // Validate customer exists
+        // Validate customer exists - O(log n)
         Customer customer = searchById(customerId);
         if (customer == null) {
             System.out.println("Customer not found.");
             return;
         }
 
-        // Validate product exists
+        // Validate product exists - O(log n)
         Product product = Product.searchById(productId);
         if (product == null) {
             System.out.println("Product not found.");
@@ -99,21 +185,8 @@ public class Customer {
             return;
         }
 
-        // Generate new order ID
-        int newOrderId = 1;
-        if (!Order.orders.empty()) {
-            Order.orders.findFirst();
-            int maxId = 0;
-            while (Order.orders.retrieve() != null) {
-                Order o = Order.orders.retrieve();
-                if (o.orderId > maxId) {
-                    maxId = o.orderId;
-                }
-                if (Order.orders.last()) break;
-                Order.orders.findNext();
-            }
-            newOrderId = maxId + 1;
-        }
+        // Generate new order ID using AVL tree
+        int newOrderId = Order.getNextOrderId();
 
         // Create list of products (add product quantity times)
         LinkedList<Product> productList = new LinkedList<Product>();
@@ -142,49 +215,47 @@ public class Customer {
         System.out.println("Order placed successfully. Order ID: " + newOrderId);
     }
 
+    /**
+     * Phase II: View order history - uses AVL trees for efficient retrieval
+     */
     public static void viewOrderHistory(int customerId) {
-        // Validate customer exists
+        // Validate customer exists - O(log n)
         Customer customer = searchById(customerId);
         if (customer == null) {
             System.out.println("Customer not found.");
             return;
         }
 
-        if (Order.orders.empty()) {
+        LinkedList<Order> customerOrders = Order.getOrdersByCustomer(customerId);
+        
+        if (customerOrders.empty()) {
             System.out.println("No orders found for customer " + customer.name + ".");
             return;
         }
 
         System.out.println("Order History for " + customer.name + " (ID: " + customerId + "):");
-        boolean found = false;
-
-        Order.orders.findFirst();
-        while (Order.orders.retrieve() != null) {
-            Order o = Order.orders.retrieve();
-            if (o.customer.customerId == customerId) {
-                System.out.println(o);
-                found = true;
-            }
-            if (Order.orders.last()) break;
-            Order.orders.findNext();
-        }
-
-        if (!found) {
-            System.out.println("No orders found for this customer.");
+        customerOrders.findFirst();
+        while (customerOrders.retrieve() != null) {
+            System.out.println(customerOrders.retrieve());
+            if (customerOrders.last()) break;
+            customerOrders.findNext();
         }
     }
 
 
 
+    /**
+     * Phase II: Add review to product - uses AVL trees for efficient lookups
+     */
     public static void addReviewToProduct(int customerId, int productId, double rating, String comment) {
-        // Validate customer exists
+        // Validate customer exists - O(log n)
         Customer customer = searchById(customerId);
         if (customer == null) {
             System.out.println("Customer not found.");
             return;
         }
 
-        // Validate product exists
+        // Validate product exists - O(log n)
         Product product = Product.searchById(productId);
         if (product == null) {
             System.out.println("Product not found.");
@@ -198,20 +269,7 @@ public class Customer {
         }
 
         // Generate new review ID
-        int newReviewId = 1;
-        if (!Review.allReviews.empty()) {
-            Review.allReviews.findFirst();
-            int maxId = 0;
-            while (Review.allReviews.retrieve() != null) {
-                Review r = Review.allReviews.retrieve();
-                if (r.reviewId > maxId) {
-                    maxId = r.reviewId;
-                }
-                if (Review.allReviews.last()) break;
-                Review.allReviews.findNext();
-            }
-            newReviewId = maxId + 1;
-        }
+        int newReviewId = Review.getNextReviewId();
 
         // Create and add review
         Review newReview = new Review(newReviewId, product, customer, comment, rating);
@@ -222,8 +280,11 @@ public class Customer {
     }
 
 
+    /**
+     * Phase II: Print customer reviews - uses AVL trees
+     */
     public static void printCustomerReviews(int customerId) {
-        // Validate customer exists
+        // Validate customer exists - O(log n)
         Customer customer = searchById(customerId);
         if (customer == null) {
             System.out.println("Customer not found.");
@@ -244,5 +305,19 @@ public class Customer {
             if (customerReviews.last()) break;
             customerReviews.findNext();
         }
+    }
+    
+    /**
+     * Phase II: Get all customers sorted alphabetically
+     */
+    public static LinkedList<Customer> getAllCustomersSortedAlphabetically() {
+        return customerTreeByName.inOrderTraversal();
+    }
+    
+    /**
+     * Phase II: Get the number of customers - O(1)
+     */
+    public static int getCustomerCount() {
+        return customerTreeById.size();
     }
 }

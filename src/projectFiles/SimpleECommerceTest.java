@@ -1,38 +1,65 @@
 package projectFiles;
 import java.util.Scanner;
 
+/**
+ * E-Commerce System Test - Phase II with AVL Tree implementation
+ * All data structures use AVL Trees for O(log n) operations.
+ */
 public class SimpleECommerceTest {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
+        
+        System.out.println("=== E-Commerce System Phase II ===");
+        System.out.println("Using AVL Trees for O(log n) operations\n");
+        
         SimpleCSVReader.loadProducts("products.csv");
         SimpleCSVReader.loadCustomers("customers.csv");
         SimpleCSVReader.loadOrders("orders.csv");
         SimpleCSVReader.loadReviews("reviews.csv");
+        
+        System.out.println("\nData loaded successfully:");
+        System.out.println("- Products: " + Product.getProductCount());
+        System.out.println("- Customers: " + Customer.getCustomerCount());
+        System.out.println("- Orders: " + Order.getOrderCount());
+        System.out.println("- Reviews: " + Review.getReviewCount());
 
         while (true) {
-            System.out.println("\nMenu:");
-            System.out.println("1. View all products");
+            System.out.println("\n============ MENU ============");
+            System.out.println("--- View Data ---");
+            System.out.println("1. View all products (sorted by ID)");
             System.out.println("2. View all customers");
-            System.out.println("3. View all orders");
+            System.out.println("3. View all orders (sorted by ID)");
             System.out.println("4. View all reviews");
-            System.out.println("5. Add product");
-            System.out.println("6. Search product (by ID or Name)");
-            System.out.println("7. Update product");
+            System.out.println("--- Product Operations ---");
+            System.out.println("5. Add product [O(log n)]");
+            System.out.println("6. Search product by ID [O(log n)]");
+            System.out.println("7. Update product [O(log n)]");
             System.out.println("8. View product average rating");
-            System.out.println("9. Add customer");
+            System.out.println("--- Customer Operations ---");
+            System.out.println("9. Add customer [O(log n)]");
             System.out.println("10. View customer order history");
-            System.out.println("11. Search order by ID");
-            System.out.println("12. View out of stock products");
-            System.out.println("13. View top 3 rated products");
-            System.out.println("14. View orders between dates");
-            System.out.println("15. Add review to product");
-            System.out.println("16. Edit review");
-            System.out.println("17. View customer reviews");
-            System.out.println("18. View common high-rated products (rating > 4.0)");
-            System.out.println("19. Place an order");
-            System.out.println("20. Cancel an order");
-            System.out.println("21. Update order status");
-            System.out.println("22. Exit");
+            System.out.println("--- Order Operations ---");
+            System.out.println("11. Search order by ID [O(log n)]");
+            System.out.println("12. Place an order");
+            System.out.println("13. Cancel an order [O(log n)]");
+            System.out.println("14. Update order status [O(log n)]");
+            System.out.println("--- Phase II: Advanced Queries ---");
+            System.out.println("15. View products in price range [Range Query]");
+            System.out.println("16. View orders between dates [Range Query with AVL]");
+            System.out.println("17. View customers sorted alphabetically [In-order Traversal]");
+            System.out.println("18. View top 3 rated products");
+            System.out.println("19. View top 3 most reviewed products");
+            System.out.println("20. View customers who reviewed a product (sorted by rating)");
+            System.out.println("--- Reviews ---");
+            System.out.println("21. Add review to product");
+            System.out.println("22. Edit review [O(log n)]");
+            System.out.println("23. View customer reviews");
+            System.out.println("24. View common high-rated products (rating > 4.0)");
+            System.out.println("--- Other ---");
+            System.out.println("25. View out of stock products");
+            System.out.println("26. Performance comparison (Phase I vs Phase II)");
+            System.out.println("27. Exit");
+            System.out.println("================================");
             System.out.print("Choose option: ");
 
             int choice = scan.nextInt();
@@ -63,33 +90,20 @@ public class SimpleECommerceTest {
                     int newStock = scan.nextInt();
                     Product newProduct = new Product(newProdId, newProdName, newPrice, newStock);
                     if (Product.addProduct(newProduct)) {
-                        System.out.println("Product added successfully.");
+                        System.out.println("Product added successfully using AVL Tree [O(log n)].");
                     }
                     break;
                 case 6:
-                    System.out.print("Search by (1) ID or (2) Name? ");
-                    int searchChoice = scan.nextInt();
-                    scan.nextLine();
-                    if (searchChoice == 1) {
-                        System.out.print("Enter product ID: ");
-                        int searchId = scan.nextInt();
-                        Product foundById = Product.searchById(searchId);
-                        if (foundById != null) {
-                            System.out.println("Product found: " + foundById);
-                        } else {
-                            System.out.println("Product not found.");
-                        }
-                    } else if (searchChoice == 2) {
-                        System.out.print("Enter product name: ");
-                        String searchName = scan.nextLine();
-                        Product foundByName = Product.searchByName(searchName);
-                        if (foundByName != null) {
-                            System.out.println("Product found: " + foundByName);
-                        } else {
-                            System.out.println("Product not found.");
-                        }
+                    System.out.print("Enter product ID: ");
+                    int searchId = scan.nextInt();
+                    long startTime = System.nanoTime();
+                    Product foundById = Product.searchById(searchId);
+                    long endTime = System.nanoTime();
+                    if (foundById != null) {
+                        System.out.println("Product found: " + foundById);
+                        System.out.println("Search time (AVL): " + (endTime - startTime) + " ns [O(log n)]");
                     } else {
-                        System.out.println("Invalid choice.");
+                        System.out.println("Product not found.");
                     }
                     break;
                 case 7:
@@ -121,7 +135,7 @@ public class SimpleECommerceTest {
                     String newCustEmail = scan.nextLine();
                     Customer newCustomer = new Customer(newCustId, newCustName, newCustEmail);
                     if (Customer.addCustomer(newCustomer)) {
-                        System.out.println("Customer added successfully.");
+                        System.out.println("Customer added successfully using AVL Tree [O(log n)].");
                     }
                     break;
                 case 10:
@@ -132,27 +146,77 @@ public class SimpleECommerceTest {
                 case 11:
                     System.out.print("Enter order ID: ");
                     int searchOrderId = scan.nextInt();
+                    startTime = System.nanoTime();
                     Order foundOrder = Order.searchById(searchOrderId);
+                    endTime = System.nanoTime();
                     if (foundOrder != null) {
                         System.out.println("Order found: " + foundOrder);
+                        System.out.println("Search time (AVL): " + (endTime - startTime) + " ns [O(log n)]");
                     } else {
                         System.out.println("Order not found.");
                     }
                     break;
                 case 12:
-                    Product.printOutOfStock();
+                    System.out.print("Enter customer ID: ");
+                    int placeCustomerId = scan.nextInt();
+                    System.out.print("Enter product ID: ");
+                    int placeProductId = scan.nextInt();
+                    System.out.print("Enter quantity: ");
+                    int quantity = scan.nextInt();
+                    scan.nextLine(); 
+                    System.out.print("Enter order date (YYYY-MM-DD): ");
+                    String orderDate = scan.nextLine();
+                    Customer.placeOrder(placeCustomerId, placeProductId, quantity, orderDate);
                     break;
                 case 13:
-                    Product.topThreeProducts();
+                    System.out.print("Enter order ID to cancel: ");
+                    int cancelId = scan.nextInt();
+                    Order.cancelOrder(cancelId);
                     break;
                 case 14:
+                    System.out.print("Enter order ID to update: ");
+                    int updateId = scan.nextInt();
+                    scan.nextLine();
+                    System.out.print("Enter new status (pending/shipped/delivered/canceled): ");
+                    String newStatus = scan.nextLine();
+                    Order.updateOrderStatus(updateId, newStatus);
+                    break;
+                case 15:
+                    // Phase II: Products in price range
+                    System.out.print("Enter minimum price: ");
+                    double minPrice = scan.nextDouble();
+                    System.out.print("Enter maximum price: ");
+                    double maxPrice = scan.nextDouble();
+                    Product.printProductsInPriceRange(minPrice, maxPrice);
+                    break;
+                case 16:
+                    // Phase II: Orders between dates
+                    scan.nextLine(); // Clear buffer after previous input
                     System.out.print("Enter start date (YYYY-MM-DD): ");
                     String start = scan.nextLine();
                     System.out.print("Enter end date (YYYY-MM-DD): ");
                     String end = scan.nextLine();
                     Order.printOrdersBetween(start, end);
                     break;
-                case 15:
+                case 17:
+                    // Phase II: Customers sorted alphabetically
+                    Customer.printAllSortedAlphabetically();
+                    break;
+                case 18:
+                    // Phase II: Top 3 rated products
+                    Product.topThreeProducts();
+                    break;
+                case 19:
+                    // Phase II: Top 3 most reviewed products
+                    Product.topThreeMostReviewedProducts();
+                    break;
+                case 20:
+                    // Phase II: Customers who reviewed a product
+                    System.out.print("Enter product ID: ");
+                    int reviewedProdId = scan.nextInt();
+                    Review.printCustomersWhoReviewedProduct(reviewedProdId);
+                    break;
+                case 21:
                     System.out.print("Enter customer ID: ");
                     int custId = scan.nextInt();
                     System.out.print("Enter product ID: ");
@@ -164,7 +228,7 @@ public class SimpleECommerceTest {
                     String comment = scan.nextLine();
                     Customer.addReviewToProduct(custId, prodId, rating, comment);
                     break;
-                case 16:
+                case 22:
                     System.out.print("Enter review ID to edit: ");
                     int reviewId = scan.nextInt();
                     System.out.print("Enter new rating (1-5): ");
@@ -174,12 +238,12 @@ public class SimpleECommerceTest {
                     String newComment = scan.nextLine();
                     Review.editReview(reviewId, newRating, newComment);
                     break;
-                case 17:
+                case 23:
                     System.out.print("Enter customer ID: ");
                     int customerId = scan.nextInt();
                     Customer.printCustomerReviews(customerId);
                     break;
-                case 18:
+                case 24:
                     System.out.print("Enter first customer ID: ");
                     int cust1 = scan.nextInt();
                     System.out.print("Enter second customer ID: ");
@@ -198,32 +262,14 @@ public class SimpleECommerceTest {
                         }
                     }
                     break;
-                case 19:
-                    System.out.print("Enter customer ID: ");
-                    int placeCustomerId = scan.nextInt();
-                    System.out.print("Enter product ID: ");
-                    int placeProductId = scan.nextInt();
-                    System.out.print("Enter quantity: ");
-                    int quantity = scan.nextInt();
-                    scan.nextLine(); 
-                    System.out.print("Enter order date (YYYY-MM-DD): ");
-                    String orderDate = scan.nextLine();
-                    Customer.placeOrder(placeCustomerId, placeProductId, quantity, orderDate);
+                case 25:
+                    Product.printOutOfStock();
                     break;
-                case 20:
-                    System.out.print("Enter order ID to cancel: ");
-                    int cancelId = scan.nextInt();
-                    Order.cancelOrder(cancelId);
+                case 26:
+                    // Performance comparison
+                    performanceComparison();
                     break;
-                case 21:
-                    System.out.print("Enter order ID to update: ");
-                    int updateId = scan.nextInt();
-                    scan.nextLine();
-                    System.out.print("Enter new status (pending/shipped/delivered/canceled): ");
-                    String newStatus = scan.nextLine();
-                    Order.updateOrderStatus(updateId, newStatus);
-                    break;
-                case 22:
+                case 27:
                     System.out.println("Exiting program.");
                     scan.close();
                     return;
@@ -231,5 +277,100 @@ public class SimpleECommerceTest {
                     System.out.println("Invalid option.");
             }
         }
+    }
+    
+    /**
+     * Phase II: Performance comparison between Phase I (LinkedList) and Phase II (AVL Tree)
+     */
+    private static void performanceComparison() {
+        System.out.println("\n=== PERFORMANCE COMPARISON ===");
+        System.out.println("Phase I (LinkedList) vs Phase II (AVL Tree)\n");
+        
+        int testProductId = 125; // Mid-range product ID for fair comparison
+        int testCustomerId = 215; // Mid-range customer ID
+        int testOrderId = 350; // Mid-range order ID
+        
+        // Product Search Comparison
+        System.out.println("--- Product Search (ID: " + testProductId + ") ---");
+        
+        // Phase I: Linear search
+        long startLinear = System.nanoTime();
+        Product p1 = Product.searchByIdLinear(testProductId);
+        long endLinear = System.nanoTime();
+        long linearTime = endLinear - startLinear;
+        
+        // Phase II: AVL search
+        long startAVL = System.nanoTime();
+        Product p2 = Product.searchById(testProductId);
+        long endAVL = System.nanoTime();
+        long avlTime = endAVL - startAVL;
+        
+        System.out.println("Phase I (LinkedList O(n)): " + linearTime + " ns");
+        System.out.println("Phase II (AVL Tree O(log n)): " + avlTime + " ns");
+        if (linearTime > avlTime) {
+            System.out.println("AVL Tree is " + String.format("%.2f", (double)linearTime / avlTime) + "x faster");
+        }
+        
+        // Customer Search Comparison
+        System.out.println("\n--- Customer Search (ID: " + testCustomerId + ") ---");
+        
+        startLinear = System.nanoTime();
+        Customer c1 = Customer.searchByIdLinear(testCustomerId);
+        endLinear = System.nanoTime();
+        linearTime = endLinear - startLinear;
+        
+        startAVL = System.nanoTime();
+        Customer c2 = Customer.searchById(testCustomerId);
+        endAVL = System.nanoTime();
+        avlTime = endAVL - startAVL;
+        
+        System.out.println("Phase I (LinkedList O(n)): " + linearTime + " ns");
+        System.out.println("Phase II (AVL Tree O(log n)): " + avlTime + " ns");
+        if (linearTime > avlTime) {
+            System.out.println("AVL Tree is " + String.format("%.2f", (double)linearTime / avlTime) + "x faster");
+        }
+        
+        // Order Search Comparison
+        System.out.println("\n--- Order Search (ID: " + testOrderId + ") ---");
+        
+        startLinear = System.nanoTime();
+        Order o1 = Order.searchByIdLinear(testOrderId);
+        endLinear = System.nanoTime();
+        linearTime = endLinear - startLinear;
+        
+        startAVL = System.nanoTime();
+        Order o2 = Order.searchById(testOrderId);
+        endAVL = System.nanoTime();
+        avlTime = endAVL - startAVL;
+        
+        System.out.println("Phase I (LinkedList O(n)): " + linearTime + " ns");
+        System.out.println("Phase II (AVL Tree O(log n)): " + avlTime + " ns");
+        if (linearTime > avlTime) {
+            System.out.println("AVL Tree is " + String.format("%.2f", (double)linearTime / avlTime) + "x faster");
+        }
+        
+        // Time Complexity Summary
+        System.out.println("\n=== TIME COMPLEXITY SUMMARY ===");
+        System.out.println("Operation              | Phase I (LinkedList) | Phase II (AVL Tree)");
+        System.out.println("-----------------------------------------------------------------");
+        System.out.println("Insert Product         | O(n)                 | O(log n)");
+        System.out.println("Search Product by ID   | O(n)                 | O(log n)");
+        System.out.println("Update Product         | O(n)                 | O(log n)");
+        System.out.println("Delete Product         | O(n)                 | O(log n)");
+        System.out.println("Insert Customer        | O(n)                 | O(log n)");
+        System.out.println("Search Customer        | O(n)                 | O(log n)");
+        System.out.println("Insert Order           | O(n)                 | O(log n)");
+        System.out.println("Search Order           | O(n)                 | O(log n)");
+        System.out.println("Price Range Query      | O(n)                 | O(n)*");
+        System.out.println("Date Range Query       | O(n)                 | O(log n + k)**");
+        System.out.println("Sorted Traversal       | O(n log n)           | O(n)***");
+        System.out.println("-----------------------------------------------------------------");
+        System.out.println("* Price range requires traversal; could be O(log n + k) with secondary AVL");
+        System.out.println("** k = number of results in range");
+        System.out.println("*** In-order traversal of AVL tree gives sorted order naturally");
+        
+        System.out.println("\n=== SPACE COMPLEXITY ===");
+        System.out.println("Phase I (LinkedList): O(n) - one node per element");
+        System.out.println("Phase II (AVL Tree):  O(n) - one node per element with height info");
     }
 }
