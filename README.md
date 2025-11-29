@@ -112,7 +112,7 @@ Custom LinkedList implementation (projectFiles.LinkedList) is maintained for:
 
 ---
 
-## 3. Interactive Menu System (27 Options)
+## 3. Interactive Menu System (29 Options)
 
 The SimpleECommerceTest provides an interactive menu with the following operations:
 
@@ -132,44 +132,46 @@ The SimpleECommerceTest provides an interactive menu with the following operatio
 | 7 | Update product | Product.updateProduct() | O(log n) |
 | 8 | View product average rating | Product.getAverageRating() | O(log P + R_avg) |
 
-### Customer Operations (Options 9-10)
+### Customer Operations (Options 9-12)
 | Option | Description | Method | Complexity |
 |--------|-------------|--------|------------|
 | 9 | Add customer | Customer.addCustomer() | O(log n) |
-| 10 | View customer order history | Customer.viewOrderHistory() | O(log C + M) |
+| 10 | Search customer by ID | Customer.searchById() | O(log n) |
+| 11 | Search customer by name | Customer.searchByName() | O(log n) |
+| 12 | View customer order history | Customer.viewOrderHistory() | O(log C + M) |
 
-### Order Operations (Options 11-14)
+### Order Operations (Options 13-16)
 | Option | Description | Method | Complexity |
 |--------|-------------|--------|------------|
-| 11 | Search order by ID | Order.searchById() | O(log n) |
-| 12 | Place an order | Customer.placeOrder() | O(log C + log P + log M) |
-| 13 | Cancel an order | Order.cancelOrder() | O(log M + L*log P) |
-| 14 | Update order status | Order.updateOrderStatus() | O(log n) |
+| 13 | Search order by ID | Order.searchById() | O(log n) |
+| 14 | Place an order | Customer.placeOrder() | O(log C + log P + log M) |
+| 15 | Cancel an order | Order.cancelOrder() | O(log M + L*log P) |
+| 16 | Update order status | Order.updateOrderStatus() | O(log n) |
 
-### Phase II: Advanced Queries (Options 15-20)
+### Phase II: Advanced Queries (Options 17-22)
 | Option | Description | Method | Complexity |
 |--------|-------------|--------|------------|
-| 15 | Products in price range | Product.printProductsInPriceRange() | O(P) |
-| 16 | Orders between dates | Order.printOrdersBetween() | O(log n + k) |
-| 17 | Customers sorted alphabetically | Customer.printAllSortedAlphabetically() | O(C) |
-| 18 | Top 3 rated products | Product.topThreeProducts() | O(P² + P*R_avg) |
-| 19 | Top 3 most reviewed products | Product.topThreeMostReviewedProducts() | O(P² + P) |
-| 20 | Customers who reviewed a product | Review.printCustomersWhoReviewedProduct() | O(log P + R) |
+| 17 | Products in price range | Product.printProductsInPriceRange() | O(P) |
+| 18 | Orders between dates | Order.printOrdersBetween() | O(log n + k) |
+| 19 | Customers sorted alphabetically | Customer.printAllSortedAlphabetically() | O(C) |
+| 20 | Top 3 rated products | Product.topThreeProducts() | O(P² + P*R_avg) |
+| 21 | Top 3 most reviewed products | Product.topThreeMostReviewedProducts() | O(P² + P) |
+| 22 | Customers who reviewed a product | Review.printCustomersWhoReviewedProduct() | O(log P + R) |
 
-### Reviews (Options 21-24)
+### Reviews (Options 23-26)
 | Option | Description | Method | Complexity |
 |--------|-------------|--------|------------|
-| 21 | Add review to product | Customer.addReviewToProduct() | O(log C + log P + log R) |
-| 22 | Edit review | Review.editReview() | O(log n) |
-| 23 | View customer reviews | Customer.printCustomerReviews() | O(log C + R) |
-| 24 | Common high-rated products | Review.getCommonHighRatedProducts() | O(R*R_cust + P*R_avg) |
+| 23 | Add review to product | Customer.addReviewToProduct() | O(log C + log P + log R) |
+| 24 | Edit review | Review.editReview() | O(log n) |
+| 25 | View customer reviews | Customer.printCustomerReviews() | O(log C + R) |
+| 26 | Common high-rated products | Review.getCommonHighRatedProducts() | O(R*R_cust + P*R_avg) |
 
-### Other (Options 25-27)
+### Other (Options 27-29)
 | Option | Description | Method | Complexity |
 |--------|-------------|--------|------------|
-| 25 | View out of stock products | Product.printOutOfStock() | O(P) |
-| 26 | Performance comparison | performanceComparison() | Benchmarks Phase I vs II |
-| 27 | Exit | System exit | O(1) |
+| 27 | View out of stock products | Product.printOutOfStock() | O(P) |
+| 28 | Performance comparison | performanceComparison() | Benchmarks Phase I vs II |
+| 29 | Exit | System exit | O(1) |
 
 ---
 
