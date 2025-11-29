@@ -37,28 +37,29 @@ public class SimpleECommerceTest {
             System.out.println("8. View product average rating");
             System.out.println("--- Customer Operations ---");
             System.out.println("9. Add customer [O(log n)]");
-            System.out.println("10. View customer order history");
+            System.out.println("10. Search customer by ID [O(log n)]");
+            System.out.println("11. View customer order history");
             System.out.println("--- Order Operations ---");
-            System.out.println("11. Search order by ID [O(log n)]");
-            System.out.println("12. Place an order");
-            System.out.println("13. Cancel an order [O(log n)]");
-            System.out.println("14. Update order status [O(log n)]");
+            System.out.println("12. Search order by ID [O(log n)]");
+            System.out.println("13. Place an order");
+            System.out.println("14. Cancel an order [O(log n)]");
+            System.out.println("15. Update order status [O(log n)]");
             System.out.println("--- Phase II: Advanced Queries ---");
-            System.out.println("15. View products in price range [Range Query]");
-            System.out.println("16. View orders between dates [Range Query with AVL]");
-            System.out.println("17. View customers sorted alphabetically [In-order Traversal]");
-            System.out.println("18. View top 3 rated products");
-            System.out.println("19. View top 3 most reviewed products");
-            System.out.println("20. View customers who reviewed a product (sorted by rating)");
+            System.out.println("16. View products in price range [Range Query]");
+            System.out.println("17. View orders between dates [Range Query with AVL]");
+            System.out.println("18. View customers sorted alphabetically [In-order Traversal]");
+            System.out.println("19. View top 3 rated products");
+            System.out.println("20. View top 3 most reviewed products");
+            System.out.println("21. View customers who reviewed a product (sorted by rating)");
             System.out.println("--- Reviews ---");
-            System.out.println("21. Add review to product");
-            System.out.println("22. Edit review [O(log n)]");
-            System.out.println("23. View customer reviews");
-            System.out.println("24. View common high-rated products (rating > 4.0)");
+            System.out.println("22. Add review to product");
+            System.out.println("23. Edit review [O(log n)]");
+            System.out.println("24. View customer reviews");
+            System.out.println("25. View common high-rated products (rating > 4.0)");
             System.out.println("--- Other ---");
-            System.out.println("25. View out of stock products");
-            System.out.println("26. Performance comparison (Phase I vs Phase II)");
-            System.out.println("27. Exit");
+            System.out.println("26. View out of stock products");
+            System.out.println("27. Performance comparison (Phase I vs Phase II)");
+            System.out.println("28. Exit");
             System.out.println("================================");
             System.out.print("Choose option: ");
 
@@ -140,10 +141,23 @@ public class SimpleECommerceTest {
                     break;
                 case 10:
                     System.out.print("Enter customer ID: ");
+                    int searchCustId = scan.nextInt();
+                    startTime = System.nanoTime();
+                    Customer foundCustomer = Customer.searchById(searchCustId);
+                    endTime = System.nanoTime();
+                    if (foundCustomer != null) {
+                        System.out.println("Customer found: " + foundCustomer);
+                        System.out.println("Search time (AVL): " + (endTime - startTime) + " ns [O(log n)]");
+                    } else {
+                        System.out.println("Customer not found.");
+                    }
+                    break;
+                case 11:
+                    System.out.print("Enter customer ID: ");
                     int historyCustomerId = scan.nextInt();
                     Customer.viewOrderHistory(historyCustomerId);
                     break;
-                case 11:
+                case 12:
                     System.out.print("Enter order ID: ");
                     int searchOrderId = scan.nextInt();
                     startTime = System.nanoTime();
@@ -156,7 +170,7 @@ public class SimpleECommerceTest {
                         System.out.println("Order not found.");
                     }
                     break;
-                case 12:
+                case 13:
                     System.out.print("Enter customer ID: ");
                     int placeCustomerId = scan.nextInt();
                     System.out.print("Enter product ID: ");
@@ -168,12 +182,12 @@ public class SimpleECommerceTest {
                     String orderDate = scan.nextLine();
                     Customer.placeOrder(placeCustomerId, placeProductId, quantity, orderDate);
                     break;
-                case 13:
+                case 14:
                     System.out.print("Enter order ID to cancel: ");
                     int cancelId = scan.nextInt();
                     Order.cancelOrder(cancelId);
                     break;
-                case 14:
+                case 15:
                     System.out.print("Enter order ID to update: ");
                     int updateId = scan.nextInt();
                     scan.nextLine();
@@ -181,7 +195,7 @@ public class SimpleECommerceTest {
                     String newStatus = scan.nextLine();
                     Order.updateOrderStatus(updateId, newStatus);
                     break;
-                case 15:
+                case 16:
                     // Phase II: Products in price range
                     System.out.print("Enter minimum price: ");
                     double minPrice = scan.nextDouble();
@@ -189,7 +203,7 @@ public class SimpleECommerceTest {
                     double maxPrice = scan.nextDouble();
                     Product.printProductsInPriceRange(minPrice, maxPrice);
                     break;
-                case 16:
+                case 17:
                     // Phase II: Orders between dates
                     scan.nextLine(); // Clear buffer after previous input
                     System.out.print("Enter start date (YYYY-MM-DD): ");
@@ -198,25 +212,25 @@ public class SimpleECommerceTest {
                     String end = scan.nextLine();
                     Order.printOrdersBetween(start, end);
                     break;
-                case 17:
+                case 18:
                     // Phase II: Customers sorted alphabetically
                     Customer.printAllSortedAlphabetically();
                     break;
-                case 18:
+                case 19:
                     // Phase II: Top 3 rated products
                     Product.topThreeProducts();
                     break;
-                case 19:
+                case 20:
                     // Phase II: Top 3 most reviewed products
                     Product.topThreeMostReviewedProducts();
                     break;
-                case 20:
+                case 21:
                     // Phase II: Customers who reviewed a product
                     System.out.print("Enter product ID: ");
                     int reviewedProdId = scan.nextInt();
                     Review.printCustomersWhoReviewedProduct(reviewedProdId);
                     break;
-                case 21:
+                case 22:
                     System.out.print("Enter customer ID: ");
                     int custId = scan.nextInt();
                     System.out.print("Enter product ID: ");
@@ -228,7 +242,7 @@ public class SimpleECommerceTest {
                     String comment = scan.nextLine();
                     Customer.addReviewToProduct(custId, prodId, rating, comment);
                     break;
-                case 22:
+                case 23:
                     System.out.print("Enter review ID to edit: ");
                     int reviewId = scan.nextInt();
                     System.out.print("Enter new rating (1-5): ");
@@ -238,12 +252,12 @@ public class SimpleECommerceTest {
                     String newComment = scan.nextLine();
                     Review.editReview(reviewId, newRating, newComment);
                     break;
-                case 23:
+                case 24:
                     System.out.print("Enter customer ID: ");
                     int customerId = scan.nextInt();
                     Customer.printCustomerReviews(customerId);
                     break;
-                case 24:
+                case 25:
                     System.out.print("Enter first customer ID: ");
                     int cust1 = scan.nextInt();
                     System.out.print("Enter second customer ID: ");
@@ -262,14 +276,14 @@ public class SimpleECommerceTest {
                         }
                     }
                     break;
-                case 25:
+                case 26:
                     Product.printOutOfStock();
                     break;
-                case 26:
+                case 27:
                     // Performance comparison
                     performanceComparison();
                     break;
-                case 27:
+                case 28:
                     System.out.println("Exiting program.");
                     scan.close();
                     return;
