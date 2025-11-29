@@ -187,10 +187,10 @@ public class AVLTree<K extends Comparable<K>, V> {
             node.right = deleteRec(node.right, key);
         } else {
             // Node to be deleted found
-            size--;
 
             // Node with only one child or no child
             if (node.left == null || node.right == null) {
+                size--;
                 AVLNode<K, V> temp = (node.left != null) ? node.left : node.right;
                 if (temp == null) {
                     // No child case
@@ -204,7 +204,7 @@ public class AVLTree<K extends Comparable<K>, V> {
                 AVLNode<K, V> temp = minNode(node.right);
                 node.key = temp.key;
                 node.data = temp.data;
-                size++; // Compensate for the recursive delete
+                // Recursively delete successor (size will be decremented there)
                 node.right = deleteRec(node.right, temp.key);
             }
         }

@@ -277,8 +277,11 @@ public class Product {
 
     /**
      * Phase II: Range query by price - returns products within [minPrice, maxPrice]
-     * Uses AVL traversal to find products in range - O(n) where n is total products
-     * (Note: For true O(log n + k) we would need a secondary AVL keyed by price)
+     * This query traverses all products O(n) since products are keyed by ID, not price.
+     * For true O(log n + k) price range queries, a secondary AVL tree keyed by price 
+     * could be implemented. The primary benefit of Phase II is the O(log n) ID-based
+     * lookups for insert, search, update operations - a significant improvement over
+     * Phase I's O(n) linear search.
      */
     public static LinkedList<Product> getProductsInPriceRange(double minPrice, double maxPrice) {
         LinkedList<Product> result = new LinkedList<Product>();

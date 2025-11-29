@@ -1,5 +1,7 @@
 package projectFiles;
 
+import java.util.Locale;
+
 /**
  * Customer class - Phase II implementation with AVL Tree storage
  * Customers are stored in AVL Tree keyed by customer name (alphabetically sorted).
@@ -42,8 +44,9 @@ public class Customer {
         }
         
         // Insert into AVL Trees - O(log n) each
+        // Use Locale.ROOT for consistent case-insensitive comparison
         customerTreeById.insert(c.customerId, c);
-        customerTreeByName.insert(c.name.toLowerCase(), c); // Case-insensitive key
+        customerTreeByName.insert(c.name.toLowerCase(Locale.ROOT), c);
         
         // Also maintain LinkedList for backward compatibility
         if (customers.empty()) {
@@ -89,7 +92,7 @@ public class Customer {
      * Phase II: Search customer by name using AVL Tree - O(log n) time complexity
      */
     public static Customer searchByName(String name) {
-        return customerTreeByName.search(name.toLowerCase());
+        return customerTreeByName.search(name.toLowerCase(Locale.ROOT));
     }
 
     /**
@@ -139,8 +142,8 @@ public class Customer {
         Customer c = searchById(id); // O(log n)
         if (c != null) {
             // Need to update the name tree if name changed
-            String oldNameKey = c.name.toLowerCase();
-            String newNameKey = newName.toLowerCase();
+            String oldNameKey = c.name.toLowerCase(Locale.ROOT);
+            String newNameKey = newName.toLowerCase(Locale.ROOT);
             
             if (!oldNameKey.equals(newNameKey)) {
                 // Remove from name tree and re-insert with new key

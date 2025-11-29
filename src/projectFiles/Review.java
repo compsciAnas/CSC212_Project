@@ -322,15 +322,18 @@ public class Review {
             productReviews.findNext();
         }
 
-        // Sort by rating (descending) using bubble sort
-        for (int k = 0; k < count - 1; k++) {
-            for (int j = 0; j < count - 1 - k; j++) {
-                if (reviewArray[j].rating < reviewArray[j + 1].rating) {
-                    Review temp = reviewArray[j];
-                    reviewArray[j] = reviewArray[j + 1];
-                    reviewArray[j + 1] = temp;
-                }
+        // Sort by rating (descending) using insertion sort
+        // Note: For a small number of reviews per product (typically < 100),
+        // simple sorting algorithms are acceptable. The main Phase II optimization
+        // is the O(log n) lookup of the product itself.
+        for (int k = 1; k < count; k++) {
+            Review key = reviewArray[k];
+            int j = k - 1;
+            while (j >= 0 && reviewArray[j].rating < key.rating) {
+                reviewArray[j + 1] = reviewArray[j];
+                j--;
             }
+            reviewArray[j + 1] = key;
         }
 
         System.out.println("Customers who reviewed " + product.name + " (sorted by rating):");

@@ -191,6 +191,7 @@ public class SimpleECommerceTest {
                     break;
                 case 16:
                     // Phase II: Orders between dates
+                    scan.nextLine(); // Clear buffer after previous input
                     System.out.print("Enter start date (YYYY-MM-DD): ");
                     String start = scan.nextLine();
                     System.out.print("Enter end date (YYYY-MM-DD): ");
