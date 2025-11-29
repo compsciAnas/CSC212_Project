@@ -15,7 +15,7 @@ classDiagram
         +void remove()
     }
 
-    %% Data Structure Classes
+    %% Phase I Data Structure Classes
     class Node~T~ {
         +T data
         +Node~T~ next
@@ -37,22 +37,61 @@ classDiagram
         +Node~T~ getHead()
     }
 
-    %% Business Logic Classes
+    %% Phase II: AVL Tree Data Structure Classes
+    class AVLNode~K,V~ {
+        +K key
+        +V data
+        +AVLNode~K,V~ left
+        +AVLNode~K,V~ right
+        +int height
+        +AVLNode(K key, V data)
+    }
+
+    class AVLTree~K,V~ {
+        -AVLNode~K,V~ root
+        -int size
+        +AVLTree()
+        -int height(AVLNode)
+        -int getBalance(AVLNode)
+        -void updateHeight(AVLNode)
+        -AVLNode rightRotate(AVLNode)
+        -AVLNode leftRotate(AVLNode)
+        +void insert(K key, V data)
+        +V search(K key)
+        +boolean contains(K key)
+        +void delete(K key)
+        +LinkedList~V~ inOrderTraversal()
+        +LinkedList~V~ rangeQuery(K min, K max)
+        +V getMin()
+        +V getMax()
+        +boolean isEmpty()
+        +int size()
+        +boolean update(K key, V data)
+    }
+
+    %% Business Logic Classes - Phase II with AVL Trees
     class Customer {
         +int customerId
         +String name
         +String email
+        +AVLTree~String,Customer~ customerTreeByName$
+        +AVLTree~Integer,Customer~ customerTreeById$
         +LinkedList~Customer~ customers$
         +Customer(int, String, String)
         +String toString()
         +boolean addCustomer(Customer)$
         +Customer searchById(int)$
+        +Customer searchByIdLinear(int)$
+        +Customer searchByName(String)$
         +void printAll()$
+        +void printAllSortedAlphabetically()$
         +void updateCustomer(int, String, String)$
         +void placeOrder(int, int, int, String)$
         +void viewOrderHistory(int)$
         +void addReviewToProduct(int, int, double, String)$
         +void printCustomerReviews(int)$
+        +LinkedList~Customer~ getAllCustomersSortedAlphabetically()$
+        +int getCustomerCount()$
     }
 
     class Product {
@@ -61,19 +100,27 @@ classDiagram
         +double price
         +int stock
         +LinkedList~Review~ reviews
+        +AVLTree~Integer,Product~ productTree$
         +LinkedList~Product~ products$
         +Product(int, String, double, int)
         +void addReview(Review)
         +double getAverageRating()
+        +int getReviewCount()
         +String toString()
         +boolean addProduct(Product)$
         +Product searchById(int)$
+        +Product searchByIdLinear(int)$
         +Product searchByName(String)$
         +void updateProduct(int, double, int)$
         +void removeProduct(int)$
         +void printAll()$
         +void printOutOfStock()$
         +void topThreeProducts()$
+        +void topThreeMostReviewedProducts()$
+        +LinkedList~Product~ getProductsInPriceRange(double, double)$
+        +void printProductsInPriceRange(double, double)$
+        +LinkedList~Product~ getAllProductsSorted()$
+        +int getProductCount()$
     }
 
     class Order {
@@ -83,15 +130,24 @@ classDiagram
         +double totalPrice
         +String orderDate
         +String status
+        +AVLTree~Integer,Order~ orderTree$
+        +AVLTree~String,LinkedList~ orderTreeByDate$
         +LinkedList~Order~ orders$
+        +int maxOrderId$
         +Order(int, Customer, LinkedList~Product~, double, String, String)
         +String toString()
+        +int getNextOrderId()$
         +void addOrder(Order)$
         +void printAll()$
         +void printOrdersBetween(String, String)$
         +Order searchById(int)$
+        +Order searchByIdLinear(int)$
         +void updateOrderStatus(int, String)$
         +void cancelOrder(int)$
+        +LinkedList~Order~ getOrdersByCustomer(int)$
+        +LinkedList~Order~ getOrdersBetweenDates(String, String)$
+        +LinkedList~Order~ getAllOrdersSorted()$
+        +int getOrderCount()$
     }
 
     class Review {
@@ -100,19 +156,26 @@ classDiagram
         +Customer customer
         +String comment
         +double rating
+        +AVLTree~Integer,Review~ reviewTree$
         +LinkedList~Review~ allReviews$
+        +int maxReviewId$
         +Review(int, Product, Customer, String, double)
         +String toString()
+        +int getNextReviewId()$
         +void addReview(Review)$
+        +Review searchById(int)$
         +void editReview(int, double, String)$
         +LinkedList~Review~ getReviewsByCustomer(int)$
         +LinkedList~Product~ getCommonHighRatedProducts(int, int)$
         +void printAll()$
+        +void printCustomersWhoReviewedProduct(int)$
+        +int getReviewCount()$
     }
 
     %% Implementation Relationships
     List~T~ <|.. LinkedList~T~ : implements
     LinkedList~T~ o-- Node~T~ : contains
+    AVLTree~K,V~ o-- AVLNode~K,V~ : contains
     
     %% Business Logic Relationships with Cardinality
     Customer "1" -- "0..*" Order : places
@@ -122,11 +185,13 @@ classDiagram
     Review "*" --> "1" Customer : written by
     Review "*" --> "1" Product : about
     
-    %% Collection Relationships
-    Customer o-- "1" LinkedList~Customer~ : stores all
-    Product o-- "1" LinkedList~Product~ : stores all
-    Product o-- "1" LinkedList~Review~ : has
-    Order o-- "1" LinkedList~Order~ : stores all
-    Order o-- "1" LinkedList~Product~ : contains
-    Review o-- "1" LinkedList~Review~ : stores all
+    %% Phase II: AVL Tree Collection Relationships
+    Customer o-- "1" AVLTree~Integer,Customer~ : stores by ID
+    Customer o-- "1" AVLTree~String,Customer~ : stores by Name
+    Product o-- "1" AVLTree~Integer,Product~ : stores by ID
+    Product o-- "1" LinkedList~Review~ : has reviews
+    Order o-- "1" AVLTree~Integer,Order~ : stores by ID
+    Order o-- "1" AVLTree~String,LinkedList~ : stores by Date
+    Order o-- "1" LinkedList~Product~ : contains products
+    Review o-- "1" AVLTree~Integer,Review~ : stores by ID
 ```

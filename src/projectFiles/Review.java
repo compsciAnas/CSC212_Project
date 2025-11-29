@@ -1,5 +1,9 @@
 package projectFiles;
 
+/**
+ * Review class - Phase II implementation with AVL Tree storage
+ * Reviews are stored in AVL Tree keyed by reviewId for O(log n) operations.
+ */
 public class Review {
     int reviewId;
     Product product;
@@ -7,8 +11,14 @@ public class Review {
     String comment;
     double rating;
 
-
+    // Phase II: AVL Tree keyed by reviewId for O(log n) operations
+    static AVLTree<Integer, Review> reviewTree = new AVLTree<Integer, Review>();
+    
+    // Phase I: LinkedList maintained for compatibility
     static LinkedList<Review> allReviews = new LinkedList<Review>();
+    
+    // Track the maximum review ID for generating new IDs
+    static int maxReviewId = 0;
 
     public Review(int reviewId, Product product, Customer customer, String comment, double rating) {
         this.reviewId = reviewId;
@@ -25,8 +35,26 @@ public class Review {
                " | Comment: " + comment;
     }
 
+    /**
+     * Phase II: Get the next available review ID
+     */
+    public static int getNextReviewId() {
+        return maxReviewId + 1;
+    }
 
+    /**
+     * Phase II: Add review using AVL Tree - O(log n) time complexity
+     */
     public static void addReview(Review r) {
+        // Update maxReviewId if necessary
+        if (r.reviewId > maxReviewId) {
+            maxReviewId = r.reviewId;
+        }
+        
+        // Insert into AVL Tree - O(log n)
+        reviewTree.insert(r.reviewId, r);
+        
+        // Also maintain LinkedList for backward compatibility
         if (allReviews.empty()) {
             allReviews.insert(r);
         } else {
@@ -38,39 +66,40 @@ public class Review {
         }
     }
 
+    /**
+     * Phase II: Search review by ID using AVL Tree - O(log n)
+     */
+    public static Review searchById(int id) {
+        return reviewTree.search(id);
+    }
 
+    /**
+     * Phase II: Edit review using AVL Tree - O(log n) search
+     */
     public static void editReview(int reviewId, double newRating, String newComment) {
-        if (allReviews.empty()) {
-            System.out.println("No reviews found.");
-            return;
+        Review r = searchById(reviewId); // O(log n)
+        if (r != null) {
+            r.rating = newRating;
+            r.comment = newComment;
+            System.out.println("Review updated successfully.");
+        } else {
+            System.out.println("Review not found.");
         }
-
-        allReviews.findFirst();
-        while (allReviews.retrieve() != null) {
-            Review r = allReviews.retrieve();
-            if (r.reviewId == reviewId) {
-                r.rating = newRating;
-                r.comment = newComment;
-                System.out.println("Review updated successfully.");
-                return;
-            }
-            if (allReviews.last()) break;
-            allReviews.findNext();
-        }
-        System.out.println("Review not found.");
     }
 
 
     public static LinkedList<Review> getReviewsByCustomer(int customerId) {
         LinkedList<Review> customerReviews = new LinkedList<Review>();
         
-        if (allReviews.empty()) {
+        if (reviewTree.isEmpty()) {
             return customerReviews;
         }
 
-        allReviews.findFirst();
-        while (allReviews.retrieve() != null) {
-            Review r = allReviews.retrieve();
+        // Traverse all reviews using in-order traversal
+        LinkedList<Review> allReviewsSorted = reviewTree.inOrderTraversal();
+        allReviewsSorted.findFirst();
+        while (allReviewsSorted.retrieve() != null) {
+            Review r = allReviewsSorted.retrieve();
             if (r.customer.customerId == customerId) {
                 if (customerReviews.empty()) {
                     customerReviews.insert(r);
@@ -82,8 +111,8 @@ public class Review {
                     customerReviews.insert(r);
                 }
             }
-            if (allReviews.last()) break;
-            allReviews.findNext();
+            if (allReviewsSorted.last()) break;
+            allReviewsSorted.findNext();
         }
         
         return customerReviews;
@@ -95,10 +124,11 @@ public class Review {
 
         // Get products reviewed by customer 1
         LinkedList<Integer> products1 = new LinkedList<Integer>();
-        if (!allReviews.empty()) {
-            allReviews.findFirst();
-            while (allReviews.retrieve() != null) {
-                Review r = allReviews.retrieve();
+        LinkedList<Review> allReviewsSorted = reviewTree.inOrderTraversal();
+        if (!allReviewsSorted.empty()) {
+            allReviewsSorted.findFirst();
+            while (allReviewsSorted.retrieve() != null) {
+                Review r = allReviewsSorted.retrieve();
                 if (r.customer.customerId == customerId1) {
                     int productId = r.product.productId;
                     // Check if product already in list
@@ -126,17 +156,18 @@ public class Review {
                         }
                     }
                 }
-                if (allReviews.last()) break;
-                allReviews.findNext();
+                if (allReviewsSorted.last()) break;
+                allReviewsSorted.findNext();
             }
         }
 
         // Get products reviewed by customer 2
         LinkedList<Integer> products2 = new LinkedList<Integer>();
-        if (!allReviews.empty()) {
-            allReviews.findFirst();
-            while (allReviews.retrieve() != null) {
-                Review r = allReviews.retrieve();
+        allReviewsSorted = reviewTree.inOrderTraversal();
+        if (!allReviewsSorted.empty()) {
+            allReviewsSorted.findFirst();
+            while (allReviewsSorted.retrieve() != null) {
+                Review r = allReviewsSorted.retrieve();
                 if (r.customer.customerId == customerId2) {
                     int productId = r.product.productId;
                     // Check if product already in list
@@ -164,8 +195,8 @@ public class Review {
                         }
                     }
                 }
-                if (allReviews.last()) break;
-                allReviews.findNext();
+                if (allReviewsSorted.last()) break;
+                allReviewsSorted.findNext();
             }
         }
 
@@ -189,9 +220,9 @@ public class Review {
                     }
                 }
 
-                // If common, check if average rating > 4.0
+                // If common, check if average rating > 4.0 using AVL search
                 if (inProducts2) {
-                    Product p = Product.searchById(productId);
+                    Product p = Product.searchById(productId); // O(log n)
                     if (p != null && p.getAverageRating() > 4.0) {
                         if (result.empty()) {
                             result.insert(p);
@@ -213,17 +244,105 @@ public class Review {
         return result;
     }
 
+    /**
+     * Phase II: Print all reviews using in-order traversal
+     */
     public static void printAll() {
-        if (allReviews.empty()) {
+        if (reviewTree.isEmpty()) {
             System.out.println("No reviews available.");
             return;
         }
 
-        allReviews.findFirst();
-        while (allReviews.retrieve() != null) {
-            System.out.println(allReviews.retrieve());
-            if (allReviews.last()) break;
-            allReviews.findNext();
+        LinkedList<Review> sortedReviews = reviewTree.inOrderTraversal();
+        sortedReviews.findFirst();
+        while (sortedReviews.retrieve() != null) {
+            System.out.println(sortedReviews.retrieve());
+            if (sortedReviews.last()) break;
+            sortedReviews.findNext();
         }
+    }
+
+    /**
+     * Phase II: Get all customers who reviewed a specific product (sorted by rating)
+     */
+    public static void printCustomersWhoReviewedProduct(int productId) {
+        Product product = Product.searchById(productId); // O(log n)
+        if (product == null) {
+            System.out.println("Product not found.");
+            return;
+        }
+
+        // Collect all reviews for this product
+        LinkedList<Review> productReviews = new LinkedList<Review>();
+        LinkedList<Review> allReviewsSorted = reviewTree.inOrderTraversal();
+        
+        if (allReviewsSorted.empty()) {
+            System.out.println("No reviews found for this product.");
+            return;
+        }
+
+        allReviewsSorted.findFirst();
+        while (allReviewsSorted.retrieve() != null) {
+            Review r = allReviewsSorted.retrieve();
+            if (r.product.productId == productId) {
+                if (productReviews.empty()) {
+                    productReviews.insert(r);
+                } else {
+                    productReviews.findFirst();
+                    while (!productReviews.last()) {
+                        productReviews.findNext();
+                    }
+                    productReviews.insert(r);
+                }
+            }
+            if (allReviewsSorted.last()) break;
+            allReviewsSorted.findNext();
+        }
+
+        if (productReviews.empty()) {
+            System.out.println("No customers have reviewed this product.");
+            return;
+        }
+
+        // Count reviews and create arrays for sorting
+        int count = 0;
+        productReviews.findFirst();
+        while (productReviews.retrieve() != null) {
+            count++;
+            if (productReviews.last()) break;
+            productReviews.findNext();
+        }
+
+        Review[] reviewArray = new Review[count];
+        int i = 0;
+        productReviews.findFirst();
+        while (productReviews.retrieve() != null) {
+            reviewArray[i++] = productReviews.retrieve();
+            if (productReviews.last()) break;
+            productReviews.findNext();
+        }
+
+        // Sort by rating (descending) using bubble sort
+        for (int k = 0; k < count - 1; k++) {
+            for (int j = 0; j < count - 1 - k; j++) {
+                if (reviewArray[j].rating < reviewArray[j + 1].rating) {
+                    Review temp = reviewArray[j];
+                    reviewArray[j] = reviewArray[j + 1];
+                    reviewArray[j + 1] = temp;
+                }
+            }
+        }
+
+        System.out.println("Customers who reviewed " + product.name + " (sorted by rating):");
+        for (int l = 0; l < count; l++) {
+            System.out.println("  " + reviewArray[l].customer.name + " - Rating: " + reviewArray[l].rating);
+        }
+    }
+
+    /**
+     * Phase II: Get the number of reviews - O(1)
+     */
+    public static int getReviewCount() {
+        return reviewTree.size();
     }
 }
