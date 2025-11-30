@@ -61,6 +61,7 @@ classDiagram
         +boolean contains(K key)
         +void delete(K key)
         +LinkedList~V~ inOrderTraversal()
+        +LinkedList~V~ reverseInOrderTraversal()
         +LinkedList~V~ rangeQuery(K min, K max)
         +V getMin()
         +V getMax()
@@ -102,6 +103,7 @@ classDiagram
         +LinkedList~Review~ reviews
         +AVLTree~Integer,Product~ productTree$
         +AVLTree~Double,LinkedList~ productTreeByPrice$
+        +AVLTree~Integer,LinkedList~ productTreeByReviewCount$
         +LinkedList~Product~ products$
         +Product(int, String, double, int)
         +void addReview(Review)
@@ -118,6 +120,7 @@ classDiagram
         +void printOutOfStock()$
         +void topThreeProducts()$
         +void topThreeMostReviewedProducts()$
+        +void updateProductReviewCount(int, int, int)$
         +LinkedList~Product~ getProductsInPriceRange(double, double)$
         +void printProductsInPriceRange(double, double)$
         +LinkedList~Product~ getAllProductsSorted()$
@@ -194,6 +197,7 @@ classDiagram
     Customer o-- "1" AVLTree~String,Customer~ : stores by Name
     Product o-- "1" AVLTree~Integer,Product~ : stores by ID
     Product o-- "1" AVLTree~Double,LinkedList~ : stores by Price
+    Product o-- "1" AVLTree~Integer,LinkedList~ : stores by Review Count
     Product o-- "1" LinkedList~Review~ : has reviews
     Order o-- "1" AVLTree~Integer,Order~ : stores by ID
     Order o-- "1" AVLTree~String,LinkedList~ : stores by Date

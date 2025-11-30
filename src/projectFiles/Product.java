@@ -19,6 +19,10 @@ public class Product {
     // Since multiple products can have the same price, we store a LinkedList of products per price
     static AVLTree<Double, LinkedList<Product>> productTreeByPrice = new AVLTree<Double, LinkedList<Product>>();
     
+    // Phase II: Secondary AVL Tree keyed by review count for O(log n + k) top reviewed queries
+    // Since multiple products can have the same review count, we store a LinkedList of products per count
+    static AVLTree<Integer, LinkedList<Product>> productTreeByReviewCount = new AVLTree<Integer, LinkedList<Product>>();
+    
     // Phase I: LinkedList maintained for compatibility and iteration
     static LinkedList<Product> products = new LinkedList<Product>();
 
@@ -94,6 +98,26 @@ public class Product {
                     productsAtPrice.findNext();
                 }
                 productsAtPrice.insert(p);
+            }
+        }
+        
+        // Insert into secondary AVL Tree keyed by review count - O(log n)
+        int reviewCount = 0; // New products have 0 reviews
+        LinkedList<Product> productsWithCount = productTreeByReviewCount.search(reviewCount);
+        if (productsWithCount == null) {
+            productsWithCount = new LinkedList<Product>();
+            productsWithCount.insert(p);
+            productTreeByReviewCount.insert(reviewCount, productsWithCount);
+        } else {
+            // Add to existing list at this count
+            if (productsWithCount.empty()) {
+                productsWithCount.insert(p);
+            } else {
+                productsWithCount.findFirst();
+                while (!productsWithCount.last()) {
+                    productsWithCount.findNext();
+                }
+                productsWithCount.insert(p);
             }
         }
         
@@ -242,6 +266,26 @@ public class Product {
                 // If list is now empty, remove the price entry from tree
                 if (priceList.empty()) {
                     productTreeByPrice.delete(price);
+                }
+            }
+            
+            // Remove from productTreeByReviewCount
+            int reviewCount = p.getReviewCount();
+            LinkedList<Product> countList = productTreeByReviewCount.search(reviewCount);
+            if (countList != null && !countList.empty()) {
+                countList.findFirst();
+                Product currentProduct = countList.retrieve();
+                while (currentProduct != null) {
+                    if (currentProduct.productId == id) {
+                        countList.remove();
+                        break;
+                    }
+                    if (countList.last()) break;
+                    countList.findNext();
+                    currentProduct = countList.retrieve();
+                }
+                if (countList.empty()) {
+                    productTreeByReviewCount.delete(reviewCount);
                 }
             }
             
@@ -462,59 +506,86 @@ public class Product {
     }
 
     /**
-     * Phase II: Top 3 most reviewed products
+     * Phase II: Update product's position in the review count tree when a review is added
+     * Called by Customer.addReviewToProduct() - O(log n)
+     */
+    public static void updateProductReviewCount(int productId, int oldCount, int newCount) {
+        Product p = searchById(productId);
+        if (p == null) return;
+        
+        // Remove from old count list
+        LinkedList<Product> oldCountList = productTreeByReviewCount.search(oldCount);
+        if (oldCountList != null && !oldCountList.empty()) {
+            oldCountList.findFirst();
+            Product currentProduct = oldCountList.retrieve();
+            while (currentProduct != null) {
+                if (currentProduct.productId == productId) {
+                    oldCountList.remove();
+                    break;
+                }
+                if (oldCountList.last()) break;
+                oldCountList.findNext();
+                currentProduct = oldCountList.retrieve();
+            }
+            if (oldCountList.empty()) {
+                productTreeByReviewCount.delete(oldCount);
+            }
+        }
+        
+        // Add to new count list
+        LinkedList<Product> newCountList = productTreeByReviewCount.search(newCount);
+        if (newCountList == null) {
+            newCountList = new LinkedList<Product>();
+            newCountList.insert(p);
+            productTreeByReviewCount.insert(newCount, newCountList);
+        } else {
+            if (newCountList.empty()) {
+                newCountList.insert(p);
+            } else {
+                newCountList.findFirst();
+                while (!newCountList.last()) {
+                    newCountList.findNext();
+                }
+                newCountList.insert(p);
+            }
+        }
+    }
+
+    /**
+     * Phase II: Top 3 most reviewed products using AVL tree with reverse in-order traversal
+     * Time Complexity: O(log n + 3) ≈ O(log n) - much better than O(n²) bubble sort!
      */
     public static void topThreeMostReviewedProducts() {
-        if (productTree.isEmpty()) {
+        if (productTreeByReviewCount.isEmpty()) {
             System.out.println("No products available.");
             return;
         }
 
-        LinkedList<Product> allProducts = productTree.inOrderTraversal();
+        // Use reverse in-order traversal to get products in descending order of review count
+        LinkedList<LinkedList<Product>> sortedByCount = productTreeByReviewCount.reverseInOrderTraversal();
         
-        // Count products
-        int count = 0;
-        allProducts.findFirst();
-        while (allProducts.retrieve() != null) {
-            count++;
-            if (allProducts.last()) break;
-            allProducts.findNext();
-        }
-
-        // Create arrays
-        Product[] productArray = new Product[count];
-        int[] reviewCounts = new int[count];
-
-        int i = 0;
-        allProducts.findFirst();
-        while (allProducts.retrieve() != null) {
-            Product p = allProducts.retrieve();
-            productArray[i] = p;
-            reviewCounts[i] = p.getReviewCount();
-            i++;
-            if (allProducts.last()) break;
-            allProducts.findNext();
-        }
-
-        // Bubble sort by review count (descending)
-        for (int k = 0; k < count - 1; k++) {
-            for (int j = 0; j < count - 1 - k; j++) {
-                if (reviewCounts[j] < reviewCounts[j + 1]) {
-                    int tempCount = reviewCounts[j];
-                    reviewCounts[j] = reviewCounts[j + 1];
-                    reviewCounts[j + 1] = tempCount;
-                    
-                    Product tempProduct = productArray[j];
-                    productArray[j] = productArray[j + 1];
-                    productArray[j + 1] = tempProduct;
+        System.out.println("Top 3 Most Reviewed Products:");
+        int rank = 1;
+        
+        sortedByCount.findFirst();
+        while (sortedByCount.retrieve() != null && rank <= 3) {
+            LinkedList<Product> productsWithSameCount = sortedByCount.retrieve();
+            if (!productsWithSameCount.empty()) {
+                productsWithSameCount.findFirst();
+                while (productsWithSameCount.retrieve() != null && rank <= 3) {
+                    Product p = productsWithSameCount.retrieve();
+                    System.out.println(rank + ". " + p.name + " - Reviews: " + p.getReviewCount());
+                    rank++;
+                    if (productsWithSameCount.last()) break;
+                    productsWithSameCount.findNext();
                 }
             }
+            if (sortedByCount.last()) break;
+            sortedByCount.findNext();
         }
-
-        // Display top 3 most reviewed products
-        System.out.println("Top 3 Most Reviewed Products:");
-        for (int l = 0; l < 3 && l < count; l++) {
-            System.out.println((l + 1) + ". " + productArray[l].name + " - Reviews: " + reviewCounts[l]);
+        
+        if (rank == 1) {
+            System.out.println("No products have been reviewed yet.");
         }
     }
 }

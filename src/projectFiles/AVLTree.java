@@ -375,4 +375,31 @@ public class AVLTree<K extends Comparable<K>, V> {
             return node;
         }
     }
+
+    /**
+     * Reverse in-order traversal - returns elements in descending order
+     * Visits Right → Root → Left to get elements sorted by key in descending order
+     */
+    public LinkedList<V> reverseInOrderTraversal() {
+        LinkedList<V> result = new LinkedList<V>();
+        reverseInOrderRec(root, result);
+        return result;
+    }
+
+    private void reverseInOrderRec(AVLNode<K, V> node, LinkedList<V> result) {
+        if (node != null) {
+            reverseInOrderRec(node.right, result);  // Visit right first
+            // Add to end of list
+            if (result.empty()) {
+                result.insert(node.data);
+            } else {
+                result.findFirst();
+                while (!result.last()) {
+                    result.findNext();
+                }
+                result.insert(node.data);
+            }
+            reverseInOrderRec(node.left, result);   // Then visit left
+        }
+    }
 }
