@@ -177,9 +177,16 @@ public class SimpleCSVReader {
                     Customer c = Customer.searchById(customerId);
                     
                     if (p != null && c != null) {
+                        // Get old review count before adding the new review
+                        int oldCount = p.getReviewCount();
+                        
                         Review review = new Review(reviewId, p, c, comment, rating);
                         Review.addReview(review);
                         p.addReview(review);
+                        
+                        // Update the product's position in the review count tree
+                        int newCount = p.getReviewCount();
+                        Product.updateProductReviewCount(productId, oldCount, newCount);
                     } else {
                         if (p == null) System.out.println("Product not found for review: " + productId);
                         if (c == null) System.out.println("Customer not found for review: " + customerId);

@@ -45,6 +45,7 @@ java -cp out projectFiles.SimpleECommerceTest
 This Phase II implementation uses **AVL Trees** (self-balancing BSTs) for O(log n) operations:
 - **Product.productTree**: AVL Tree keyed by productId
 - **Product.productTreeByPrice**: Secondary AVL Tree keyed by price (for O(log n + k) price range queries)
+- **Product.productTreeByReviewCount**: Secondary AVL Tree keyed by review count (for O(log n + k) top reviewed queries)
 - **Customer.customerTreeById**: AVL Tree keyed by customerId
 - **Customer.customerTreeByName**: AVL Tree keyed by customer name (for alphabetical sorting)
 - **Order.orderTree**: AVL Tree keyed by orderId
@@ -73,7 +74,8 @@ Custom LinkedList implementation (projectFiles.LinkedList) is maintained for:
 - **Product.printAll()**: Prints all products sorted by ID using in-order traversal - O(P).
 - **Product.printOutOfStock()**: Prints products with stock <= 0 - O(P).
 - **Product.topThreeProducts()**: Top 3 by rating using Bubble Sort - O(P² + P*R_avg).
-- **Product.topThreeMostReviewedProducts()**: Top 3 by review count - O(P² + P*R_avg).
+- **Product.topThreeMostReviewedProducts()**: Top 3 by review count using AVL reverse in-order traversal - O(log P + 3).
+- **Product.updateProductReviewCount(productId, oldCount, newCount)**: Updates product position in review count tree - O(log P).
 - **Product.getProductsInPriceRange(min, max)**: Range query - O(log P + k) using secondary AVL tree.
 - **Product.getAverageRating()**: Instance method - O(R_avg).
 
@@ -157,7 +159,7 @@ The SimpleECommerceTest provides an interactive menu with the following operatio
 | 18 | Orders between dates | Order.printOrdersBetween() | O(log n + k) |
 | 19 | Customers sorted alphabetically | Customer.printAllSortedAlphabetically() | O(C) |
 | 20 | Top 3 rated products | Product.topThreeProducts() | O(P² + P*R_avg) |
-| 21 | Top 3 most reviewed products | Product.topThreeMostReviewedProducts() | O(P² + P) |
+| 21 | Top 3 most reviewed products | Product.topThreeMostReviewedProducts() | O(log P + 3) |
 | 22 | Customers who reviewed a product | Review.printCustomersWhoReviewedProduct() | O(log P + k) |
 
 ### Reviews (Options 23-26)
@@ -272,9 +274,10 @@ CSC212_Project/
 | printAll() | O(P) | O(P) | In-order traversal |
 | printOutOfStock() | O(P) | O(1) | Traverse all |
 | topThreeProducts() | O(P² + P*R_avg) | O(P) | Bubble sort |
+| topThreeMostReviewedProducts() | O(log P + 3) | O(1) | AVL reverse in-order traversal |
+| updateProductReviewCount(id, old, new) | O(log P) | O(1) | Update review count tree position |
 | getAverageRating() | O(R_avg) | O(1) | Instance reviews |
 | getProductsInPriceRange(min, max) | O(log P + k) | O(k) | Secondary AVL range query |
-| topThreeMostReviewedProducts() | O(P² + P) | O(P) | Bubble sort |
 
 #### Customer Class Methods
 
@@ -327,7 +330,8 @@ CSC212_Project/
 | delete(key) | O(log n) | O(1) | Self-balancing delete |
 | contains(key) | O(log n) | O(1) | Existence check |
 | rangeQuery(min, max) | O(log n + k) | O(k) | Range retrieval |
-| inOrderTraversal() | O(n) | O(n) | Sorted output |
+| inOrderTraversal() | O(n) | O(n) | Sorted output (ascending) |
+| reverseInOrderTraversal() | O(n) | O(n) | Sorted output (descending) |
 | getMin(), getMax() | O(log n) | O(1) | Tree extremes |
 | size(), isEmpty() | O(1) | O(1) | Maintained counter |
 | update(key, data) | O(log n) | O(1) | Find and update |

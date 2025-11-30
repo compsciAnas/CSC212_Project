@@ -268,6 +268,9 @@ public class Customer {
             return;
         }
 
+        // Get old review count before adding the new review
+        int oldCount = product.getReviewCount();
+
         // Generate new review ID
         int newReviewId = Review.getNextReviewId();
 
@@ -275,6 +278,10 @@ public class Customer {
         Review newReview = new Review(newReviewId, product, customer, comment, rating);
         Review.addReview(newReview);
         product.addReview(newReview);
+
+        // Update the product's position in the review count tree
+        int newCount = product.getReviewCount();
+        Product.updateProductReviewCount(productId, oldCount, newCount);
 
         System.out.println("Review added successfully. Review ID: " + newReviewId);
     }
