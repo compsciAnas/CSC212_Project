@@ -132,12 +132,13 @@ public class SimpleECommerceTest {
                     int newCustId = scan.nextInt();
                     scan.nextLine();
                     System.out.print("Enter customer name: ");
-                    String newCustName = scan.nextLine();
+                    String newCustName = scan.nextLine().trim();
                     System.out.print("Enter customer email: ");
-                    String newCustEmail = scan.nextLine();
+                    String newCustEmail = scan.nextLine().trim();
                     Customer newCustomer = new Customer(newCustId, newCustName, newCustEmail);
                     if (Customer.addCustomer(newCustomer)) {
                         System.out.println("Customer added successfully using AVL Tree [O(log n)].");
+                        System.out.println("Added: " + newCustomer);
                     }
                     break;
                 case 10:
@@ -161,6 +162,7 @@ public class SimpleECommerceTest {
                         System.out.println("Error: Customer name cannot be empty.");
                         break;
                     }
+                    System.out.println("Searching for: '" + searchCustName + "'");
                     startTime = System.nanoTime();
                     Customer foundByName = Customer.searchByName(searchCustName);
                     endTime = System.nanoTime();
