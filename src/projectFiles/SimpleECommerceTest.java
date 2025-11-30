@@ -380,26 +380,27 @@ public class SimpleECommerceTest {
         
         // Time Complexity Summary
         System.out.println("\n=== TIME COMPLEXITY SUMMARY ===");
-        System.out.println("Operation              | Phase I (LinkedList) | Phase II (AVL Tree)");
-        System.out.println("-----------------------------------------------------------------");
-        System.out.println("Insert Product         | O(n)                 | O(log n)");
-        System.out.println("Search Product by ID   | O(n)                 | O(log n)");
-        System.out.println("Update Product         | O(n)                 | O(log n)");
-        System.out.println("Delete Product         | O(n)                 | O(log n)");
-        System.out.println("Insert Customer        | O(n)                 | O(log n)");
-        System.out.println("Search Customer        | O(n)                 | O(log n)");
-        System.out.println("Insert Order           | O(n)                 | O(log n)");
-        System.out.println("Search Order           | O(n)                 | O(log n)");
-        System.out.println("Price Range Query      | O(n)                 | O(n)*");
-        System.out.println("Date Range Query       | O(n)                 | O(log n + k)**");
-        System.out.println("Sorted Traversal       | O(n log n)           | O(n)***");
-        System.out.println("-----------------------------------------------------------------");
-        System.out.println("* Price range requires traversal; could be O(log n + k) with secondary AVL");
-        System.out.println("** k = number of results in range");
-        System.out.println("*** In-order traversal of AVL tree gives sorted order naturally");
+        System.out.println("Operation                    | Phase I (LinkedList) | Phase II (AVL Tree)");
+        System.out.println("---------------------------------------------------------------------");
+        System.out.println("Insert Product               | O(n)                 | O(log n)");
+        System.out.println("Search Product by ID         | O(n)                 | O(log n)");
+        System.out.println("Update Product               | O(n)                 | O(log n)");
+        System.out.println("Delete Product               | O(n)                 | O(log n)");
+        System.out.println("Insert Customer              | O(n)                 | O(log n)");
+        System.out.println("Search Customer              | O(n)                 | O(log n)");
+        System.out.println("Insert Order                 | O(n)                 | O(log n)");
+        System.out.println("Search Order                 | O(n)                 | O(log n)");
+        System.out.println("Price Range Query            | O(n)                 | O(log n + k)*");
+        System.out.println("Date Range Query             | O(n)                 | O(log n + k)*");
+        System.out.println("Reviews by Product ID        | O(n)                 | O(log n + k)*");
+        System.out.println("Sorted Traversal             | O(n log n)           | O(n)**");
+        System.out.println("---------------------------------------------------------------------");
+        System.out.println("* k = number of results in range");
+        System.out.println("** In-order traversal of AVL tree gives sorted order naturally");
         
         System.out.println("\n=== SPACE COMPLEXITY ===");
         System.out.println("Phase I (LinkedList): O(n) - one node per element");
         System.out.println("Phase II (AVL Tree):  O(n) - one node per element with height info");
+        System.out.println("                      + secondary trees for range queries");
     }
 }
