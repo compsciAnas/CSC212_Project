@@ -132,43 +132,22 @@ public class Order {
 
     /**
      * Phase II: Print orders between two dates using AVL tree date range
-     * Uses in-order traversal of date tree for efficiency
+     * Delegates to getOrdersBetweenDates to avoid code duplication (DRY principle)
      */
     public static void printOrdersBetween(String startDate, String endDate) {
         System.out.println("Orders between " + startDate + " and " + endDate + ":");
-
-        if (orderTreeByDate.isEmpty()) {
-            System.out.println("No orders available.");
-            return;
-        }
-
-        // Use range query on date tree
-        LinkedList<LinkedList<Order>> dateRangeOrders = orderTreeByDate.rangeQuery(startDate, endDate);
+        LinkedList<Order> results = getOrdersBetweenDates(startDate, endDate);
         
-        if (dateRangeOrders.empty()) {
+        if (results.empty()) {
             System.out.println("No orders found in this date range.");
             return;
         }
-
-        boolean found = false;
-        dateRangeOrders.findFirst();
-        while (dateRangeOrders.retrieve() != null) {
-            LinkedList<Order> ordersOnDate = dateRangeOrders.retrieve();
-            if (!ordersOnDate.empty()) {
-                ordersOnDate.findFirst();
-                while (ordersOnDate.retrieve() != null) {
-                    System.out.println(ordersOnDate.retrieve());
-                    found = true;
-                    if (ordersOnDate.last()) break;
-                    ordersOnDate.findNext();
-                }
-            }
-            if (dateRangeOrders.last()) break;
-            dateRangeOrders.findNext();
-        }
         
-        if (!found) {
-            System.out.println("No orders found in this date range.");
+        results.findFirst();
+        while (results.retrieve() != null) {
+            System.out.println(results.retrieve());
+            if (results.last()) break;
+            results.findNext();
         }
     }
 

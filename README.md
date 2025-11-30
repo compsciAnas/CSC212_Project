@@ -98,7 +98,7 @@ Custom LinkedList implementation (projectFiles.LinkedList) is maintained for:
 - **Order.cancelOrder(int id)**: Cancels order and restores stock - O(log M + L*log P).
 - **Order.updateOrderStatus(int id, String status)**: Updates status - O(log n).
 - **Order.printAll()**: Prints all orders sorted by ID - O(M*L).
-- **Order.printOrdersBetween(start, end)**: Date range query using AVL - O(log n + k).
+- **Order.printOrdersBetween(start, end)**: Date range query using AVL - O(log n + k). Delegates to `getOrdersBetweenDates` to avoid code duplication.
 - **Order.getOrdersByCustomer(int customerId)**: Gets customer orders - O(M).
 - **Order.getOrdersBetweenDates(start, end)**: Returns orders in date range - O(log n + k).
 
@@ -302,7 +302,7 @@ CSC212_Project/
 | updateOrderStatus(id, status) | O(log M) | O(1) | AVL search + update |
 | cancelOrder(id) | O(log M + L² + L*log P) | O(L) | AVL for lookups |
 | printAll() | O(M*L) | O(M) | In-order traversal |
-| printOrdersBetween(start, end) | O(log M + k) | O(1) | AVL range query |
+| printOrdersBetween(start, end) | O(log M + k) | O(k) | Delegates to getOrdersBetweenDates |
 | getOrdersByCustomer(custId) | O(M) | O(k) | Filter all orders |
 | getOrdersBetweenDates(start, end) | O(log M + k) | O(k) | AVL range query |
 
