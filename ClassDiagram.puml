@@ -140,7 +140,7 @@ classDiagram
         +int getNextOrderId()$
         +void addOrder(Order)$
         +void printAll()$
-        +void printOrdersBetween(String, String)$
+        +void printOrdersBetween(String, String)$ %%delegates to getOrdersBetweenDates
         +Order searchById(int)$
         +Order searchByIdLinear(int)$
         +void updateOrderStatus(int, String)$
@@ -150,6 +150,8 @@ classDiagram
         +LinkedList~Order~ getAllOrdersSorted()$
         +int getOrderCount()$
     }
+
+    note for Order "printOrdersBetween() delegates to\ngetOrdersBetweenDates() to avoid\ncode duplication (DRY principle)"
 
     class Review {
         +int reviewId
