@@ -101,6 +101,7 @@ classDiagram
         +int stock
         +LinkedList~Review~ reviews
         +AVLTree~Integer,Product~ productTree$
+        +AVLTree~Double,LinkedList~ productTreeByPrice$
         +LinkedList~Product~ products$
         +Product(int, String, double, int)
         +void addReview(Review)
@@ -157,6 +158,7 @@ classDiagram
         +String comment
         +double rating
         +AVLTree~Integer,Review~ reviewTree$
+        +AVLTree~Integer,LinkedList~ reviewTreeByProductId$
         +LinkedList~Review~ allReviews$
         +int maxReviewId$
         +Review(int, Product, Customer, String, double)
@@ -189,9 +191,11 @@ classDiagram
     Customer o-- "1" AVLTree~Integer,Customer~ : stores by ID
     Customer o-- "1" AVLTree~String,Customer~ : stores by Name
     Product o-- "1" AVLTree~Integer,Product~ : stores by ID
+    Product o-- "1" AVLTree~Double,LinkedList~ : stores by Price
     Product o-- "1" LinkedList~Review~ : has reviews
     Order o-- "1" AVLTree~Integer,Order~ : stores by ID
     Order o-- "1" AVLTree~String,LinkedList~ : stores by Date
     Order o-- "1" LinkedList~Product~ : contains products
     Review o-- "1" AVLTree~Integer,Review~ : stores by ID
+    Review o-- "1" AVLTree~Integer,LinkedList~ : stores by ProductId
 ```
