@@ -156,7 +156,7 @@ public class SimpleECommerceTest {
                 case 11:
                     System.out.print("Enter customer name: ");
                     scan.nextLine(); // Clear buffer
-                    String searchCustName = scan.nextLine();
+                    String searchCustName = scan.nextLine().trim();
                     startTime = System.nanoTime();
                     Customer foundByName = Customer.searchByName(searchCustName);
                     endTime = System.nanoTime();
@@ -165,6 +165,7 @@ public class SimpleECommerceTest {
                         System.out.println("Search time (AVL): " + (endTime - startTime) + " ns [O(log n)]");
                     } else {
                         System.out.println("Customer not found.");
+                        System.out.println("Hint: Enter the full name as it appears (e.g., 'Alice Johnson'). Search is case-insensitive.");
                     }
                     break;
                 case 12:
