@@ -44,11 +44,13 @@ java -cp out projectFiles.SimpleECommerceTest
 ### Phase II: AVL Trees (Primary)
 This Phase II implementation uses **AVL Trees** (self-balancing BSTs) for O(log n) operations:
 - **Product.productTree**: AVL Tree keyed by productId
+- **Product.productTreeByPrice**: AVL Tree keyed by price (for O(log n + k) price range queries)
 - **Customer.customerTreeById**: AVL Tree keyed by customerId
 - **Customer.customerTreeByName**: AVL Tree keyed by customer name (for alphabetical sorting)
 - **Order.orderTree**: AVL Tree keyed by orderId
 - **Order.orderTreeByDate**: AVL Tree keyed by orderDate (for date range queries)
 - **Review.reviewTree**: AVL Tree keyed by reviewId
+- **Review.reviewTreeByProductId**: AVL Tree keyed by productId (for O(log n) lookup of reviews by product)
 
 ### Phase I: LinkedList (Maintained for Compatibility)
 Custom LinkedList implementation (projectFiles.LinkedList) is maintained for:
@@ -72,7 +74,7 @@ Custom LinkedList implementation (projectFiles.LinkedList) is maintained for:
 - **Product.printOutOfStock()**: Prints products with stock <= 0 - O(P).
 - **Product.topThreeProducts()**: Top 3 by rating using Bubble Sort - O(P² + P*R_avg).
 - **Product.topThreeMostReviewedProducts()**: Top 3 by review count - O(P² + P*R_avg).
-- **Product.getProductsInPriceRange(min, max)**: Range query - O(P).
+- **Product.getProductsInPriceRange(min, max)**: Range query using secondary AVL tree - O(log P + k), where k = products in range.
 - **Product.getAverageRating()**: Instance method - O(R_avg).
 
 ### Customer Operations (O(log n) with AVL Tree)
@@ -108,7 +110,7 @@ Custom LinkedList implementation (projectFiles.LinkedList) is maintained for:
 - **Review.getReviewsByCustomer(int customerId)**: Gets customer reviews - O(R).
 - **Review.getCommonHighRatedProducts(cust1, cust2)**: Common products rated >4.0 - O(R*R_cust + P_common*R_avg).
 - **Review.printAll()**: Prints all reviews - O(R).
-- **Review.printCustomersWhoReviewedProduct(int productId)**: Customers sorted by rating - O(log P + R).
+- **Review.printCustomersWhoReviewedProduct(int productId)**: Customers sorted by rating - O(log P + k), where k = reviews for the product.
 
 ---
 
@@ -151,12 +153,15 @@ The SimpleECommerceTest provides an interactive menu with the following operatio
 ### Phase II: Advanced Queries (Options 17-22)
 | Option | Description | Method | Complexity |
 |--------|-------------|--------|------------|
-| 17 | Products in price range | Product.printProductsInPriceRange() | O(P) |
-| 18 | Orders between dates | Order.printOrdersBetween() | O(log n + k) |
-| 19 | Customers sorted alphabetically | Customer.printAllSortedAlphabetically() | O(C) |
-| 20 | Top 3 rated products | Product.topThreeProducts() | O(P² + P*R_avg) |
-| 21 | Top 3 most reviewed products | Product.topThreeMostReviewedProducts() | O(P² + P) |
-| 22 | Customers who reviewed a product | Review.printCustomersWhoReviewedProduct() | O(log P + R) |
+| 17 | Products in price range | Product.printProductsInPriceRange() | O(log P + k)* |
+| 18 | Orders between dates | Order.printOrdersBetween() | O(log M + k)* |
+| 19 | Customers sorted alphabetically | Customer.printAllSortedAlphabetically() | O(C)** |
+| 20 | Top 3 rated products | Product.topThreeProducts() | O(P² + P*R_avg)** |
+| 21 | Top 3 most reviewed products | Product.topThreeMostReviewedProducts() | O(P² + P)** |
+| 22 | Customers who reviewed a product | Review.printCustomersWhoReviewedProduct() | O(log P + k)* |
+
+\* k = number of results returned. Uses secondary AVL tree for efficient range/lookup queries.
+\*\* O(n) complexity is optimal here since we must examine all elements.
 
 ### Reviews (Options 23-26)
 | Option | Description | Method | Complexity |
@@ -271,7 +276,7 @@ CSC212_Project/
 | printOutOfStock() | O(P) | O(1) | Traverse all |
 | topThreeProducts() | O(P² + P*R_avg) | O(P) | Bubble sort |
 | getAverageRating() | O(R_avg) | O(1) | Instance reviews |
-| getProductsInPriceRange(min, max) | O(P) | O(k) | Traversal filter |
+| getProductsInPriceRange(min, max) | O(log P + k) | O(k) | Secondary AVL range query |
 | topThreeMostReviewedProducts() | O(P² + P) | O(P) | Bubble sort |
 
 #### Customer Class Methods
@@ -314,7 +319,7 @@ CSC212_Project/
 | getReviewsByCustomer(custId) | O(R) | O(R_cust) | Traverse + filter |
 | getCommonHighRatedProducts(...) | O(R*R_cust + P*R_avg) | O(R_cust) | Complex query |
 | printAll() | O(R) | O(R) | In-order traversal |
-| printCustomersWhoReviewedProduct(pId) | O(log P + R) | O(R_prod) | AVL + filter + sort |
+| printCustomersWhoReviewedProduct(pId) | O(log P + k) | O(k) | Secondary AVL lookup + sort |
 
 #### AVL Tree Class Methods
 
