@@ -14,6 +14,10 @@ public class Review {
     // Phase II: AVL Tree keyed by reviewId for O(log n) operations
     static AVLTree<Integer, Review> reviewTree = new AVLTree<Integer, Review>();
     
+    // Phase II: Secondary AVL Tree keyed by productId for O(log n) lookup of reviews by product
+    // Since multiple reviews can exist for the same product, we store a LinkedList of reviews per productId
+    static AVLTree<Integer, LinkedList<Review>> reviewTreeByProductId = new AVLTree<Integer, LinkedList<Review>>();
+    
     // Phase I: LinkedList maintained for compatibility
     static LinkedList<Review> allReviews = new LinkedList<Review>();
     
@@ -53,6 +57,26 @@ public class Review {
         
         // Insert into AVL Tree - O(log n)
         reviewTree.insert(r.reviewId, r);
+        
+        // Insert into secondary AVL Tree keyed by productId - O(log n)
+        int productId = r.product.productId;
+        LinkedList<Review> reviewsForProduct = reviewTreeByProductId.search(productId);
+        if (reviewsForProduct == null) {
+            reviewsForProduct = new LinkedList<Review>();
+            reviewsForProduct.insert(r);
+            reviewTreeByProductId.insert(productId, reviewsForProduct);
+        } else {
+            // Add to existing list for this product
+            if (reviewsForProduct.empty()) {
+                reviewsForProduct.insert(r);
+            } else {
+                reviewsForProduct.findFirst();
+                while (!reviewsForProduct.last()) {
+                    reviewsForProduct.findNext();
+                }
+                reviewsForProduct.insert(r);
+            }
+        }
         
         // Also maintain LinkedList for backward compatibility
         if (allReviews.empty()) {
@@ -264,6 +288,8 @@ public class Review {
 
     /**
      * Phase II: Get all customers who reviewed a specific product (sorted by rating)
+     * Uses secondary AVL tree keyed by productId for O(log n) lookup,
+     * where n is the number of unique products reviewed.
      */
     public static void printCustomersWhoReviewedProduct(int productId) {
         Product product = Product.searchById(productId); // O(log n)
@@ -272,34 +298,10 @@ public class Review {
             return;
         }
 
-        // Collect all reviews for this product
-        LinkedList<Review> productReviews = new LinkedList<Review>();
-        LinkedList<Review> allReviewsSorted = reviewTree.inOrderTraversal();
+        // Use O(log n) lookup on the secondary AVL tree keyed by productId
+        LinkedList<Review> productReviews = reviewTreeByProductId.search(productId);
         
-        if (allReviewsSorted.empty()) {
-            System.out.println("No reviews found for this product.");
-            return;
-        }
-
-        allReviewsSorted.findFirst();
-        while (allReviewsSorted.retrieve() != null) {
-            Review r = allReviewsSorted.retrieve();
-            if (r.product.productId == productId) {
-                if (productReviews.empty()) {
-                    productReviews.insert(r);
-                } else {
-                    productReviews.findFirst();
-                    while (!productReviews.last()) {
-                        productReviews.findNext();
-                    }
-                    productReviews.insert(r);
-                }
-            }
-            if (allReviewsSorted.last()) break;
-            allReviewsSorted.findNext();
-        }
-
-        if (productReviews.empty()) {
+        if (productReviews == null || productReviews.empty()) {
             System.out.println("No customers have reviewed this product.");
             return;
         }
@@ -322,10 +324,7 @@ public class Review {
             productReviews.findNext();
         }
 
-        // Sort by rating (descending) using insertion sort
-        // Note: For a small number of reviews per product (typically < 100),
-        // simple sorting algorithms are acceptable. The main Phase II optimization
-        // is the O(log n) lookup of the product itself.
+        // Sort by rating (descending) using insertion sort - O(k log k) where k is reviews for this product
         for (int k = 1; k < count; k++) {
             Review key = reviewArray[k];
             int j = k - 1;

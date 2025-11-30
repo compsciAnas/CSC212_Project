@@ -15,6 +15,10 @@ public class Product {
     // Phase II: AVL Tree for O(log n) operations - keyed by productId
     static AVLTree<Integer, Product> productTree = new AVLTree<Integer, Product>();
     
+    // Phase II: Secondary AVL Tree keyed by price for O(log n + k) range queries
+    // Since multiple products can have the same price, we store a LinkedList of products per price
+    static AVLTree<Double, LinkedList<Product>> productTreeByPrice = new AVLTree<Double, LinkedList<Product>>();
+    
     // Phase I: LinkedList maintained for compatibility and iteration
     static LinkedList<Product> products = new LinkedList<Product>();
 
@@ -73,6 +77,25 @@ public class Product {
         
         // Insert into AVL Tree - O(log n)
         productTree.insert(p.productId, p);
+        
+        // Insert into secondary AVL Tree keyed by price - O(log n)
+        LinkedList<Product> productsAtPrice = productTreeByPrice.search(p.price);
+        if (productsAtPrice == null) {
+            productsAtPrice = new LinkedList<Product>();
+            productsAtPrice.insert(p);
+            productTreeByPrice.insert(p.price, productsAtPrice);
+        } else {
+            // Add to existing list at this price
+            if (productsAtPrice.empty()) {
+                productsAtPrice.insert(p);
+            } else {
+                productsAtPrice.findFirst();
+                while (!productsAtPrice.last()) {
+                    productsAtPrice.findNext();
+                }
+                productsAtPrice.insert(p);
+            }
+        }
         
         // Also maintain LinkedList for backward compatibility
         if (products.empty()) {
@@ -135,7 +158,52 @@ public class Product {
     public static void updateProduct(int id, double newPrice, int newStock) {
         Product p = searchById(id); // O(log n)
         if (p != null) {
-            p.price = newPrice;
+            double oldPrice = p.price;
+            
+            // If price changed, update the productTreeByPrice
+            if (oldPrice != newPrice) {
+                // Remove from old price list
+                LinkedList<Product> oldPriceList = productTreeByPrice.search(oldPrice);
+                if (oldPriceList != null && !oldPriceList.empty()) {
+                    oldPriceList.findFirst();
+                    while (oldPriceList.retrieve() != null) {
+                        if (oldPriceList.retrieve().productId == id) {
+                            oldPriceList.remove();
+                            break;
+                        }
+                        if (oldPriceList.last()) break;
+                        oldPriceList.findNext();
+                    }
+                    // If list is now empty, remove the price entry from tree
+                    if (oldPriceList.empty()) {
+                        productTreeByPrice.delete(oldPrice);
+                    }
+                }
+                
+                // Update the product's price
+                p.price = newPrice;
+                
+                // Add to new price list
+                LinkedList<Product> newPriceList = productTreeByPrice.search(newPrice);
+                if (newPriceList == null) {
+                    newPriceList = new LinkedList<Product>();
+                    newPriceList.insert(p);
+                    productTreeByPrice.insert(newPrice, newPriceList);
+                } else {
+                    if (newPriceList.empty()) {
+                        newPriceList.insert(p);
+                    } else {
+                        newPriceList.findFirst();
+                        while (!newPriceList.last()) {
+                            newPriceList.findNext();
+                        }
+                        newPriceList.insert(p);
+                    }
+                }
+            } else {
+                p.price = newPrice;
+            }
+            
             p.stock = newStock;
             System.out.println("Product updated successfully.");
         } else {
@@ -154,8 +222,28 @@ public class Product {
 
         Product p = searchById(id);
         if (p != null) {
+            double price = p.price;
+            
             // Remove from AVL Tree
             productTree.delete(id);
+            
+            // Remove from productTreeByPrice
+            LinkedList<Product> priceList = productTreeByPrice.search(price);
+            if (priceList != null && !priceList.empty()) {
+                priceList.findFirst();
+                while (priceList.retrieve() != null) {
+                    if (priceList.retrieve().productId == id) {
+                        priceList.remove();
+                        break;
+                    }
+                    if (priceList.last()) break;
+                    priceList.findNext();
+                }
+                // If list is now empty, remove the price entry from tree
+                if (priceList.empty()) {
+                    productTreeByPrice.delete(price);
+                }
+            }
             
             // Also remove from LinkedList
             if (!products.empty()) {
@@ -277,37 +365,46 @@ public class Product {
 
     /**
      * Phase II: Range query by price - returns products within [minPrice, maxPrice]
-     * This query traverses all products O(n) since products are keyed by ID, not price.
-     * For true O(log n + k) price range queries, a secondary AVL tree keyed by price 
-     * could be implemented. The primary benefit of Phase II is the O(log n) ID-based
-     * lookups for insert, search, update operations - a significant improvement over
-     * Phase I's O(n) linear search.
+     * Uses secondary AVL tree keyed by price for O(log n + k) time complexity,
+     * where k is the number of products in the price range.
      */
     public static LinkedList<Product> getProductsInPriceRange(double minPrice, double maxPrice) {
         LinkedList<Product> result = new LinkedList<Product>();
         
-        if (productTree.isEmpty()) {
+        if (productTreeByPrice.isEmpty()) {
             return result;
         }
 
-        // Traverse all products and filter by price range
-        LinkedList<Product> allProducts = productTree.inOrderTraversal();
-        allProducts.findFirst();
-        while (allProducts.retrieve() != null) {
-            Product p = allProducts.retrieve();
-            if (p.price >= minPrice && p.price <= maxPrice) {
-                if (result.empty()) {
-                    result.insert(p);
-                } else {
-                    result.findFirst();
-                    while (!result.last()) {
-                        result.findNext();
+        // Use range query on the secondary AVL tree keyed by price - O(log n + k)
+        LinkedList<LinkedList<Product>> priceLists = productTreeByPrice.rangeQuery(minPrice, maxPrice);
+        
+        if (priceLists.empty()) {
+            return result;
+        }
+        
+        // Flatten the lists of products at each price point into a single result list
+        priceLists.findFirst();
+        while (priceLists.retrieve() != null) {
+            LinkedList<Product> productsAtPrice = priceLists.retrieve();
+            if (!productsAtPrice.empty()) {
+                productsAtPrice.findFirst();
+                while (productsAtPrice.retrieve() != null) {
+                    Product p = productsAtPrice.retrieve();
+                    if (result.empty()) {
+                        result.insert(p);
+                    } else {
+                        result.findFirst();
+                        while (!result.last()) {
+                            result.findNext();
+                        }
+                        result.insert(p);
                     }
-                    result.insert(p);
+                    if (productsAtPrice.last()) break;
+                    productsAtPrice.findNext();
                 }
             }
-            if (allProducts.last()) break;
-            allProducts.findNext();
+            if (priceLists.last()) break;
+            priceLists.findNext();
         }
         
         return result;
