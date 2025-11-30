@@ -274,13 +274,15 @@ public class Product {
             LinkedList<Product> countList = productTreeByReviewCount.search(reviewCount);
             if (countList != null && !countList.empty()) {
                 countList.findFirst();
-                while (countList.retrieve() != null) {
-                    if (countList.retrieve().productId == id) {
+                Product currentProduct = countList.retrieve();
+                while (currentProduct != null) {
+                    if (currentProduct.productId == id) {
                         countList.remove();
                         break;
                     }
                     if (countList.last()) break;
                     countList.findNext();
+                    currentProduct = countList.retrieve();
                 }
                 if (countList.empty()) {
                     productTreeByReviewCount.delete(reviewCount);
@@ -515,13 +517,15 @@ public class Product {
         LinkedList<Product> oldCountList = productTreeByReviewCount.search(oldCount);
         if (oldCountList != null && !oldCountList.empty()) {
             oldCountList.findFirst();
-            while (oldCountList.retrieve() != null) {
-                if (oldCountList.retrieve().productId == productId) {
+            Product currentProduct = oldCountList.retrieve();
+            while (currentProduct != null) {
+                if (currentProduct.productId == productId) {
                     oldCountList.remove();
                     break;
                 }
                 if (oldCountList.last()) break;
                 oldCountList.findNext();
+                currentProduct = oldCountList.retrieve();
             }
             if (oldCountList.empty()) {
                 productTreeByReviewCount.delete(oldCount);
