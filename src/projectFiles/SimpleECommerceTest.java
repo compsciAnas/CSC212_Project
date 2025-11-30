@@ -154,9 +154,13 @@ public class SimpleECommerceTest {
                     }
                     break;
                 case 11:
-                    System.out.print("Enter customer name: ");
                     scan.nextLine(); // Clear buffer
+                    System.out.print("Enter customer name: ");
                     String searchCustName = scan.nextLine().trim();
+                    if (searchCustName.isEmpty()) {
+                        System.out.println("Error: Customer name cannot be empty.");
+                        break;
+                    }
                     startTime = System.nanoTime();
                     Customer foundByName = Customer.searchByName(searchCustName);
                     endTime = System.nanoTime();
