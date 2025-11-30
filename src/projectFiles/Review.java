@@ -324,7 +324,7 @@ public class Review {
             productReviews.findNext();
         }
 
-        // Sort by rating (descending) using insertion sort - O(k log k) where k is reviews for this product
+        // Sort by rating (descending) using insertion sort - O(k^2) where k is reviews for this product
         for (int k = 1; k < count; k++) {
             Review key = reviewArray[k];
             int j = k - 1;
